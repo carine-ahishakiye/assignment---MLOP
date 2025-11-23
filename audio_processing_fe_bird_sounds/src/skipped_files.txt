@@ -1,0 +1,9 @@
+C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\data\Voice of Birds\Voice of Birds\Black-capped Tinamou_sound\Black-capped Tinamou26.mp3
+C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\data\Voice of Birds\Voice of Birds\Black-capped Tinamou_sound\Black-capped Tinamou14.mp3
+C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\data\Voice of Birds\Voice of Birds\Pale-browed Tinamou_sound\Pale-browed Tinamou20.mp3
+C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\data\Voice of Birds\Voice of Birds\Pale-browed Tinamou_sound\Pale-browed Tinamou21.mp3
+C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\data\Voice of Birds\Voice of Birds\Pale-browed Tinamou_sound\Pale-browed Tinamou19.mp3
+C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\data\Voice of Birds\Voice of Birds\Brown Tinamou_sound\Brown Tinamou28.mp3
+C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\data\Voice of Birds\Voice of Birds\Andean Tinamou_sound\Andean Tinamou11.mp3
+C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\data\Voice of Birds\Voice of Birds\Andean Tinamou_sound\Andean Tinamou10.mp3
+C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\data\Voice of Birds\Voice of Birds\Andean Tinamou_sound\Andean Tinamou5.mp3

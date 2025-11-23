@@ -1,0 +1,25 @@
+{
+    "model_info": {
+        "architecture": "Deep Neural Network (4 layers)",
+        "total_parameters": 225216,
+        "optimizer": "Adam",
+        "loss_function": "categorical_crossentropy"
+    },
+    "performance_metrics": {
+        "accuracy": 0.6866666666666666,
+        "precision": 0.7182883597883599,
+        "recall": 0.6866666666666666,
+        "f1_score": 0.6777463092463092,
+        "test_loss": 1.9637422561645508
+    },
+    "training_info": {
+        "total_samples": 1500,
+        "train_samples": 1200,
+        "test_samples": 300,
+        "num_classes": 64,
+        "features": 95,
+        "best_epoch": 30,
+        "total_epochs": 30
+    },
+    "timestamp": "2025-11-23T02:01:39.109775"
+}

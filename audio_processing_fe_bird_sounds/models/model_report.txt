@@ -1,0 +1,28 @@
+BIRD SOUND CLASSIFICATION - MODEL PERFORMANCE REPORT
+Generated: 2025-11-23 01:27:36
+
+   Metric    Score Percentage               Interpretation
+ Accuracy 0.696667     69.67%          Overall correctness
+Precision 0.714241     71.42% Positive prediction accuracy
+   Recall 0.696667     69.67% True positive detection rate
+ F1-Score 0.685296     68.53%         Harmonic mean of P&R
+Test Loss 1.988372        N/A        Model error magnitude
+
+          Parameter     Value
+      Total Samples      1500
+   Training Samples      1200
+       Test Samples       300
+  Number of Classes        64
+Features per Sample        95
+   Train/Test Split     80/20
+         Best Epoch        30
+Total Training Time 30 epochs
+
+          Aspect              Details
+Total Parameters              225,216
+    Model Layers                   10
+       Optimizer                 Adam
+   Learning Rate     0.001 (adaptive)
+      Batch Size                   32
+  Regularization L2 (0.001) + Dropout
+
