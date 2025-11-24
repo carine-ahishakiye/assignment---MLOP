@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bird Sound Classification System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .status-bar {
+            background: rgba(255,255,255,0.95);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .status-item {
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .status-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .status-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .status-healthy {
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            background: #f8f9ff;
+            border-color: #764ba2;
+        }
+        
+        .upload-area.dragover {
+            background: #f0f4ff;
+            border-color: #667eea;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.2s;
+            margin: 5px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e5e7eb;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .file-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .file-item {
+            padding: 8px;
+            background: #f8f9ff;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐦 Bird Sound Classification System</h1>
+            <p>AI-Powered Bird Species Recognition</p>
+        </header>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-label">System Status</div>
+                <div class="status-value">
+                    <span class="status-indicator status-healthy"></span>
+                    <span id="system-status">Healthy</span>
+                </div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Uptime</div>
+                <div class="status-value" id="uptime">0s</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Model Version</div>
+                <div class="status-value" id="model-version">v1.1</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Total Predictions</div>
+                <div class="status-value" id="total-predictions">0</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Avg Confidence</div>
+                <div class="status-value" id="avg-confidence">0%</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>🎵 Single Prediction</h2>
+                <div class="upload-area" id="single-upload" onclick="document.getElementById('single-file').click()">
+                    <p style="font-size: 3em; margin-bottom: 10px;">📁</p>
+                    <p><strong>Click to upload</strong> or drag and drop</p>
+                    <p style="color: #666; font-size: 0.9em;">WAV or MP3 files only</p>
+                </div>
+                <input type="file" id="single-file" accept=".wav,.mp3" onchange="handleSingleFile(this.files[0])">
+                <button onclick="predictSingle()" id="predict-btn" disabled>Predict Species</button>
+                <div id="single-result"></div>
+            </div>
+
+            <div class="card">
+                <h2>📊 Species Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="species-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📈 Prediction Confidence Trend</h2>
+                <div class="chart-container">
+                    <canvas id="confidence-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📦 Bulk Upload & Retrain</h2>
+                <div class="upload-area" id="bulk-upload" onclick="document.getElementById('bulk-files').click()">
+                    <p style="font-size: 3em; margin-bottom: 10px;">📂</p>
+                    <p><strong>Upload multiple files</strong> for retraining</p>
+                    <p style="color: #666; font-size: 0.9em;">Select multiple WAV/MP3 files</p>
+                </div>
+                <input type="file" id="bulk-files" accept=".wav,.mp3" multiple onchange="handleBulkFiles(this.files)">
+                <div id="file-list" class="file-list"></div>
+                <button onclick="uploadBulkFiles()" id="upload-btn" disabled>Upload Files</button>
+                <button onclick="triggerRetrain()" id="retrain-btn">🔄 Trigger Retraining</button>
+                <div id="retrain-status"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let singleFile = null;
+        let bulkFiles = [];
+        let speciesChart = null;
+        let confidenceChart = null;
+
+        // Initialize charts
+        function initCharts() {
+            const speciesCtx = document.getElementById('species-chart').getContext('2d');
+            speciesChart = new Chart(speciesCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Predictions',
+                        data: [],
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            const confidenceCtx = document.getElementById('confidence-chart').getContext('2d');
+            confidenceChart = new Chart(confidenceCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Confidence',
+                        data: [],
+                        borderColor: 'rgba(118, 75, 162, 1)',
+                        backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 1 }
+                    }
+                }
+            });
+        }
+
+        // Drag and drop handlers
+        ['single-upload', 'bulk-upload'].forEach(id => {
+            const element = document.getElementById(id);
+            element.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                element.classList.add('dragover');
+            });
+            element.addEventListener('dragleave', () => {
+                element.classList.remove('dragover');
+            });
+            element.addEventListener('drop', (e) => {
+                e.preventDefault();
+                element.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (id === 'single-upload' && files.length > 0) {
+                    handleSingleFile(files[0]);
+                } else if (id === 'bulk-upload') {
+                    handleBulkFiles(files);
+                }
+            });
+        });
+
+        function handleSingleFile(file) {
+            singleFile = file;
+            document.getElementById('predict-btn').disabled = false;
+            document.getElementById('single-upload').innerHTML = `
+                <p style="font-size: 2em;">✓</p>
+                <p><strong>${file.name}</strong></p>
+                <p style="color: #10b981;">File ready for prediction</p>
+            `;
+        }
+
+        function handleBulkFiles(files) {
+            bulkFiles = Array.from(files);
+            document.getElementById('upload-btn').disabled = false;
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = '';
+            bulkFiles.forEach(file => {
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                div.textContent = file.name;
+                fileList.appendChild(div);
+            });
+        }
+
+        async function predictSingle() {
+            if (!singleFile) return;
+            
+            const formData = new FormData();
+            formData.append('audio', singleFile);
+            
+            document.getElementById('predict-btn').disabled = true;
+            document.getElementById('single-result').innerHTML = '<div class="alert alert-info">Processing...</div>';
+            
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    let html = '<div class="result">';
+                    html += `<h3>Predicted Species: ${data.predicted_species}</h3>`;
+                    html += `<p>Confidence: <strong>${data.confidence_percent}</strong></p>`;
+                    html += '<div class="confidence-bar"><div class="confidence-fill" style="width: ' + (data.confidence * 100) + '%"></div></div>';
+                    html += '<h4 style="margin-top: 20px;">Top 5 Predictions:</h4>';
+                    
+                    for (const [species, conf] of Object.entries(data.top_5_predictions)) {
+                        html += `<div class="result-item">
+                            <span>${species}</span>
+                            <span>${(conf * 100).toFixed(2)}%</span>
+                        </div>`;
+                    }
+                    html += '</div>';
+                    
+                    document.getElementById('single-result').innerHTML = html;
+                    updateMetrics();
+                } else {
+                    document.getElementById('single-result').innerHTML = `<div class="alert alert-error">${data.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('single-result').innerHTML = `<div class="alert alert-error">Error: ${error.message}</div>`;
+            } finally {
+                document.getElementById('predict-btn').disabled = false;
+            }
+        }
+
+        async function uploadBulkFiles() {
+            if (bulkFiles.length === 0) return;
+            
+            const formData = new FormData();
+            bulkFiles.forEach(file => formData.append('files', file));
+            
+            document.getElementById('upload-btn').disabled = true;
+            
+            try {
+                const response = await fetch('/api/upload_bulk', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert(`Successfully uploaded ${data.uploaded_count} files!`);
+                    bulkFiles = [];
+                    document.getElementById('file-list').innerHTML = '';
+                    document.getElementById('upload-btn').disabled = true;
+                } else {
+                    alert('Upload failed: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function triggerRetrain() {
+            if (!confirm('Start retraining the model? This may take several minutes.')) return;
+            
+            document.getElementById('retrain-btn').disabled = true;
+            
+            try {
+                const response = await fetch('/api/trigger_retrain', { method: 'POST' });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    monitorRetraining();
+                } else {
+                    alert('Retrain failed: ' + data.error);
+                    document.getElementById('retrain-btn').disabled = false;
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+                document.getElementById('retrain-btn').disabled = false;
+            }
+        }
+
+        async function monitorRetraining() {
+            const statusDiv = document.getElementById('retrain-status');
+            
+            const interval = setInterval(async () => {
+                try {
+                    const response = await fetch('/api/retrain_status');
+                    const data = await response.json();
+                    
+                    if (data.is_retraining) {
+                        statusDiv.innerHTML = `
+                            <div class="alert alert-info">
+                                <p><strong>Retraining in progress...</strong></p>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${data.progress}%">${data.progress}%</div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        clearInterval(interval);
+                        statusDiv.innerHTML = '<div class="alert alert-success">Retraining completed!</div>';
+                        document.getElementById('retrain-btn').disabled = false;
+                        updateMetrics();
+                    }
+                } catch (error) {
+                    clearInterval(interval);
+                    statusDiv.innerHTML = '<div class="alert alert-error">Monitoring error</div>';
+                    document.getElementById('retrain-btn').disabled = false;
+                }
+            }, 2000);
+        }
+
+        async function updateMetrics() {
+            try {
+                const [healthResponse, metricsResponse] = await Promise.all([
+                    fetch('/api/health'),
+                    fetch('/api/metrics')
+                ]);
+                
+                const health = await healthResponse.json();
+                const metrics = await metricsResponse.json();
+                
+                // Update status bar
+                document.getElementById('uptime').textContent = formatUptime(health.uptime_seconds);
+                document.getElementById('model-version').textContent = health.model_version;
+                document.getElementById('total-predictions').textContent = metrics.total_predictions;
+                document.getElementById('avg-confidence').textContent = (metrics.avg_confidence * 100).toFixed(1) + '%';
+                
+                // Update species chart
+                const species = Object.keys(metrics.species_distribution);
+                const counts = Object.values(metrics.species_distribution);
+                speciesChart.data.labels = species.slice(0, 10);
+                speciesChart.data.datasets[0].data = counts.slice(0, 10);
+                speciesChart.update();
+                
+                // Update confidence chart
+                const recent = metrics.recent_predictions.slice(-20);
+                confidenceChart.data.labels = recent.map((_, i) => i + 1);
+                confidenceChart.data.datasets[0].data = recent.map(p => p.confidence);
+                confidenceChart.update();
+                
+            } catch (error) {
+                console.error('Error updating metrics:', error);
+            }
+        }
+
+        function formatUptime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${hours}h ${minutes}m ${secs}s`;
+        }
+
+        // Initialize
+        initCharts();
+        updateMetrics();
+        setInterval(updateMetrics, 5000);
+    </script>
+</body>
+</html>
