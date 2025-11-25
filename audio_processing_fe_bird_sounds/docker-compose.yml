@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  # Main application service
+  bird-classifier:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bird-classifier:latest
+    container_name: bird-classifier-app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - MODEL_PATH=/app/models/final_model.h5
+      - SCALER_PATH=/app/models/scaler.pkl
+      - ENCODER_PATH=/app/models/label_encoder.pkl
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Mount model files
+      - ./models:/app/models:ro
+      # Mount upload directories 
+      - ./uploads:/app/uploads
+      - ./retrain_data:/app/retrain_data
+      # Mount logs
+      - ./logs:/app/logs
+    networks:
+      - bird-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+
+  # Nginx reverse proxy for load balancing
+  nginx:
+    image: nginx:alpine
+    container_name: bird-classifier-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - bird-classifier
+    networks:
+      - bird-net
+    restart: unless-stopped
+
+  # Prometheus for monitoring 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: bird-classifier-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - bird-net
+    restart: unless-stopped
+
+  # Grafana for visualization 
+  grafana:
+    image: grafana/grafana:latest
+    container_name: bird-classifier-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - bird-net
+    restart: unless-stopped
+
+networks:
+  bird-net:
+    driver: bridge
+
+volumes:
+  prometheus-data:
+  grafana-data:
+
