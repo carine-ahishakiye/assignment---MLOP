@@ -85,9 +85,6 @@ COPY src/ ./src/
 COPY templates/ ./templates/
 COPY api.py .
 
-# Copy model files if they exist (optional - can be mounted as volume)
-COPY models/*.h5 ./models/ 2>/dev/null || true
-COPY models/*.pkl ./models/ 2>/dev/null || true
 
 # Create non-root user for security
 RUN groupadd -r appuser && \

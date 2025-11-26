@@ -1,4 +1,4 @@
-# 🐦 Bird Sound Classification System - ML Pipeline Project
+#  Bird Sound Classification System - ML Pipeline Project
 
 ## 📹 Video Demonstration
 
@@ -10,13 +10,13 @@
 
 ##  Project Description
 
-This is an end-to-end Machine Learning pipeline for **Bird Sound Classification** using Deep Neural Networks. The system processes audio files (WAV/MP3), extracts 95 acoustic features, and classifies bird species with high accuracy.
+This is an end to end Machine Learning pipeline for **Bird Sound Classification** using Deep Neural Networks. The system processes audio files (WAV/MP3), extracts 95 acoustic features, and classifies bird species with high accuracy.
 
-### 🎯 Key Features
+###  Key Features
 
 1. **Single Prediction**: Upload individual audio files for instant species identification
 2. **Bulk Upload & Retraining**: Upload multiple audio files and trigger model retraining
-3. **Real-time Metrics**: System health, uptime, prediction confidence trends
+3. **Real time Metrics**: System health, uptime, prediction confidence trends
 4. **Data Visualizations**: Species distribution, confidence trends, prediction history
 5. **Scalable Architecture**: Horizontal scaling with Docker containers + NGINX load balancer
 
@@ -26,11 +26,11 @@ This is an end-to-end Machine Learning pipeline for **Bird Sound Classification*
 
 | Metric          | Score    |
 |-----------------|----------|
-| **Accuracy**    | 94.2%    |
-| **Precision**   | 93.8%    |
-| **Recall**      | 94.1%    |
-| **F1-Score**    | 93.9%    |
-| **Test Loss**   | 0.187    |
+| **Accuracy**    | 68.00%   |
+| **Precision**   | 70.63%   |
+| **Recall**      | 68.00%   |
+| **F1-Score**    | 66.85%   |
+| **Test Loss**   | 2.0806   |
 
 **Model Architecture**:
 - Input Layer: 95 features
@@ -41,18 +41,15 @@ This is an end-to-end Machine Learning pipeline for **Bird Sound Classification*
 
 ---
 
-## 🚀 Quick Start
-
 ### Prerequisites
 
 - **Docker** and **Docker Compose** installed
 - **Python 3.8+** (for local development)
 - **Audio files** in WAV or MP3 format
 
-### Option 1: Docker Deployment (Recommended)
 ```bash
 # 1. Clone the repository
-git clone <your-repo-url>
+git clone <https://github.com/carine-ahishakiye/assignment---MLOP.git>
 cd audio_processing_fe_bird_sounds
 
 # 2. Build and start containers
@@ -68,18 +65,18 @@ docker-compose ps
 # 5. View logs
 docker-compose logs -f bird-classifier
 
-# 6. Scale containers (for load testing)
+# 6. Scale containers 
 docker-compose up -d --scale bird-classifier=3
 
 # 7. Stop containers
 docker-compose down
 ```
 
-### Option 2: Local Development
+###  Local Development
 ```bash
 # 1. Create virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv\Scripts\activate
 
 # 2. Install dependencies
 pip install -r requirements.txt
@@ -92,51 +89,52 @@ python api.py
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 ```
 audio_processing_fe_bird_sounds/
 │
-├── README.md                          # This file
-├── requirements.txt                   # Python dependencies
-├── Dockerfile                         # Docker image configuration
-├── docker-compose.yml                 # Multi-container setup
-├── nginx.conf                         # Load balancer configuration
+├── README.md                          
+├── requirements.txt                  
+├── Dockerfile                         
+├── docker-compose.yml                
+├── nginx.conf                         
 │
 ├── notebook/
-│   └── bird_sound_classification.ipynb  # Complete ML pipeline notebook
+│   └── bird_sound_classification.ipynb  
 │
 ├── src/
-│   ├── preprocessing.py               # Audio feature extraction
-│   ├── model.py                       # Neural network architecture
-│   └── prediction.py                  # Inference pipeline
+│   ├── preprocessing.py               
+│   ├── model.py                     
+│   └── prediction.py  
+|               
 │
 ├── data/
 │   ├── raw/
-│   │   └── Birds Voice.csv            # Dataset metadata
-│   ├── Voice of Birds/                # Audio files by species
-│   ├── train/                         # Training data split
-│   └── test/                          # Test data split
+│   │   └── Birds Voice.csv            
+│   ├── Voice of Birds/                
+│   ├── train/                        
+│   └── test/                          
 │
 ├── models/
-│   ├── final_model.h5                 # Trained model weights
-│   ├── scaler.pkl                     # Feature scaler
-│   └── label_encoder.pkl              # Species label encoder
+│   ├── final_model.h5                 
+│   ├── scaler.pkl                     
+│   └── label_encoder.pkl              
 │
 ├── templates/
-│   └── index.html                     # Web UI
+│   └── index.html                  
 │
-├── uploads/                           # User-uploaded files
-├── retrain_data/                      # Data for retraining
-├── test_audio/                        # Sample test files
+├── uploads/                           
+├── retrain_data/                   
+├── test_audio/                        
 │
-├── api.py                             # FastAPI backend
-├── locustfile.py                      # Load testing script
-└── run_load_tests.sh                  # Load test automation
+├── api.py                             
+├── locustfile.py                      
+└── run_load_tests.sh                  
 ```
 
 ---
 
-## 📡 API Endpoints
+##  API Endpoints
 
 ### Core Endpoints
 
@@ -177,7 +175,7 @@ curl -X POST "http://localhost:5000/api/predict" \
 
 ---
 
-## 🔄 Retraining Pipeline
+##  Retraining Pipeline
 
 ### How It Works
 
@@ -186,7 +184,7 @@ curl -X POST "http://localhost:5000/api/predict" \
 3. **Monitor Progress**: Real-time progress bar shows training status
 4. **Automatic Model Update**: New model replaces the old one upon completion
 
-### Manual Retraining (CLI)
+### Manual Retraining (
 ```bash
 # 1. Add new audio files to retrain_data/
 cp new_birds/*.mp3 retrain_data/
@@ -199,11 +197,11 @@ python src/model.py --retrain --data retrain_data/
 
 ---
 
-## 🧪 Load Testing Results
+##  Load Testing Results
 
 ### Test Scenarios
 
-We tested with 1, 2, and 4 Docker containers using Locust.
+I tested with 1, 2, and 4 Docker containers using Locust.
 
 #### 1 Container
 ```bash
@@ -255,25 +253,25 @@ locust -f locustfile.py --host=http://localhost:5000 \
 | 2          | 23.7  | 312ms       | 780ms       | +93% throughput        |
 | 4          | 45.2  | 178ms       | 420ms       | +267% throughput       |
 
-**Conclusion**: Horizontal scaling with Docker containers significantly improves throughput and reduces latency. The system handles 200+ concurrent users with 4 containers while maintaining sub-500ms P95 latency.
+**Conclusion**: Horizontal scaling with Docker containers significantly improves throughput and reduces latency. The system handles 20+ concurrent users with 4 containers while maintaining sub-500ms P95 latency.
 
 ---
 
-## 📊 Data Insights & Visualizations
+##  Data Insights and Visualizations
 
 The UI provides three key visualizations:
 
-### 1. Species Distribution (Bar Chart)
+###  Species Distribution 
 - Shows the top 10 most predicted bird species
 - **Insight**: Identifies which species are most common in predictions
 - **Use Case**: Helps understand model usage patterns and dataset balance
 
-### 2. Prediction Confidence Trend (Line Chart)
+###  Prediction Confidence Trend 
 - Displays the last 20 predictions' confidence scores
 - **Insight**: Monitors model confidence over time
 - **Use Case**: Detect model degradation or need for retraining
 
-### 3. System Metrics Dashboard
+###  System Metrics Dashboard
 - **Uptime**: Tracks system availability
 - **Total Predictions**: Cumulative prediction count
 - **Average Confidence**: Overall model certainty
@@ -281,9 +279,9 @@ The UI provides three key visualizations:
 
 ---
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
-### Issue: Model not loading
+###  Model not loading
 ```bash
 # Check if model files exist
 ls -lh models/
@@ -292,13 +290,13 @@ ls -lh models/
 python src/model.py
 ```
 
-### Issue: Audio file format error
+### Audio file format error
 ```bash
 # Convert MP3 to WAV
 ffmpeg -i audio.mp3 audio.wav
 ```
 
-### Issue: Docker container not starting
+###  Docker container not starting
 ```bash
 # Check logs
 docker-compose logs bird-classifier
@@ -308,20 +306,20 @@ docker-compose down
 docker-compose up -d --build
 ```
 
-### Issue: Port 5000 already in use
+###  Port 5000 already in use
 ```bash
 # Change port in docker-compose.yml
 ports:
-  - "8080:5000"  # Use port 8080 instead
+  - "8080:5000"  
 ```
 
 ---
 
-## 🎓 Academic Context
+##  Academic Context
 
 **Course**: Machine Learning Pipeline (BSE)  
 **Institution**: African Leadership University  
-**Assignment**: MLOps Summative - End-to-End ML System
+**Assignment**: MLOps Summative -  ML System
 
 **Learning Outcomes Demonstrated**:
 1. ✅ Data acquisition and preprocessing (audio feature engineering)
@@ -335,14 +333,12 @@ ports:
 
 ---
 
-## 👨‍💻 Author
+## 👨 Author
 
 **[Your Name]**  
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
+- GitHub: [carine-ahishakiye](https://github.com/carine-ahishakiye)
+- Email: c.yibukabay@alustudent.com
 
 ---
 
-**Last Updated**: January 2025  
-**Version**: 1.1.0
+**Last Updated**: November 2025  

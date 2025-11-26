@@ -620,6 +620,14 @@
             box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
         }
 
+        .preview-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
         footer {
             background: var(--primary);
             color: rgba(255, 255, 255, 0.7);
@@ -680,12 +688,12 @@
                 Avian Recognition System
             </a>
             <ul class="nav-links">
-    <li><a href="#predict">Predict</a></li>
-    <li><a href="#analytics">Analytics</a></li>
-    <li><a href="#features">Features</a></li>
-    <li><a href="#retrain">Retrain</a></li>
-    <li><a href="#about">About</a></li>
-</ul>
+                <li><a href="#predict">Predict</a></li>
+                <li><a href="#analytics">Analytics</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#retrain">Retrain</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
         </div>
     </nav>
 
@@ -694,7 +702,7 @@
             <div class="hero-badge">
                 <i class="fas fa-certificate"></i> African Leadership University ML Pipeline
             </div>
-            <h1>Intelligent Bird Species Classification</h1>
+            <h1> Bird Species Classification</h1>
             <p class="hero-subtitle">Advanced audio analysis for automated avian identification</p>
             
             <div class="hero-meta">
@@ -707,7 +715,7 @@
                     <span class="meta-label">Avg Response Time</span>
                 </div>
                 <div class="meta-item">
-                    <span class="meta-value">1600+</span>
+                    <span class="meta-value">1500+</span>
                     <span class="meta-label">Training Samples</span>
                 </div>
             </div>
@@ -770,27 +778,29 @@
         <div id="predict">
             <h2 class="section-title">
                 <i class="fas fa-microphone"></i>
-                Single Audio Prediction
+                Single Prediction (Audio )
             </h2>
 
             <div class="card-grid">
                 <div class="card">
                     <div class="card-header">
-                        <i class="fas fa-file-audio"></i>
-                        Upload & Analyze
+                        <i class="fas fa-file-upload"></i>
+                        Upload and Analyze
                     </div>
                     <div class="card-body">
-                        <p>Upload a bird audio recording to identify the species. Our deep learning model analyzes 95 acoustic features to provide accurate classification.</p>
+                        <p>Upload a bird audio recording (MP3/WAV) to identify the species. My deep learning model analyzes acoustic features or visual patterns for accurate classification.</p>
 
                         <div class="upload-zone" id="single-upload">
                             <div class="upload-icon">
                                 <i class="fas fa-cloud-upload-alt"></i>
                             </div>
-                            <div class="upload-zone-title">Upload Audio File</div>
-                            <div class="upload-zone-subtitle">Click or drag & drop MP3 or WAV files</div>
+                            <div class="upload-zone-title">Upload Audio  File</div>
+                            <div class="upload-zone-subtitle">Click or drag & drop MP3, WAV files</div>
                         </div>
 
-                        <input type="file" id="single-file" accept=".wav,.mp3">
+                        <input type="file" id="single-file" accept=".wav,.mp3,.jpg,.jpeg,.png">
+
+                        <div id="image-preview-container"></div>
 
                         <button class="btn btn-primary" onclick="predictSingle()" id="predict-btn" disabled>
                             <i class="fas fa-search"></i> Identify Species
@@ -801,11 +811,11 @@
                 <div class="card">
                     <div class="card-header">
                         <i class="fas fa-chart-bar"></i>
-                        Results & Confidence
+                        Results and Confidence
                     </div>
                     <div class="card-body" id="result-container">
                         <p style="color: var(--text-light); text-align: center; padding: 2rem 0;">
-                            <i class="fas fa-info-circle"></i> Upload an audio file to see prediction results
+                            <i class="fas fa-info-circle"></i> Upload an audio  file to see prediction results
                         </p>
                     </div>
                 </div>
@@ -845,6 +855,68 @@
             </div>
         </div>
 
+        <div id="features" style="margin-top: 4rem;">
+            <h2 class="section-title">
+                <i class="fas fa-project-diagram"></i>
+                Feature Visualizations
+            </h2>
+
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i>
+                    Dataset Feature Analysis
+                </div>
+                <div class="card-body">
+                    <div id="feature-content">
+                        <p style="color: var(--text-light); text-align: center; padding: 1rem 0;">
+                            <i class="fas fa-spinner fa-spin"></i> Loading feature analysis...
+                        </p>
+                    </div>
+
+                    <div class="card-grid" style="margin-top: 2rem;">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-signal"></i>
+                                MFCC Analysis
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="mfcc-chart"></canvas>
+                                </div>
+                                <div id="mfcc-description" style="margin-top: 1rem; padding: 1rem; background: var(--light); border-radius: 8px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-wave-square"></i>
+                                Spectral Centroid
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="spectral-chart"></canvas>
+                                </div>
+                                <div id="spectral-description" style="margin-top: 1rem; padding: 1rem; background: var(--light); border-radius: 8px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-chart-area"></i>
+                                Zero Crossing Rate
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="zcr-chart"></canvas>
+                                </div>
+                                <div id="zcr-description" style="margin-top: 1rem; padding: 1rem; background: var(--light); border-radius: 8px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="retrain" style="margin-top: 4rem;">
             <h2 class="section-title">
                 <i class="fas fa-sync"></i>
@@ -858,118 +930,121 @@
                         Upload Training Data
                     </div>
                     <div class="card-body">
-                        <p>Upload multiple bird audio samples to improve model performance. The system will automatically preprocess and retrain the model with your data.</p>
+                        <p>Upload multiple bird audio samples  to improve model performance. The system will automatically preprocess and retrain the model with your data.</p>
 
                         <div class="upload-zone" id="bulk-upload">
                             <div class="upload-icon">
                                 <i class="fas fa-folder-open"></i>
-                            </div>
-                            <div class="upload-zone-title">Upload Multiple Files</div>
-                            <div class="upload-zone-subtitle">Drag & drop multiple MP3/WAV files or click to select</div>
-                        </div>
+</div>
+<div class="upload-zone-title">Upload Multiple Files</div>
+<div class="upload-zone-subtitle">Drag & drop multiple MP3/WAV files or click to select</div>
+</div>
+<input type="file" id="bulk-files" accept=".wav,.mp3,.jpg,.jpeg,.png" multiple>
 
-                        <input type="file" id="bulk-files" accept=".wav,.mp3" multiple>
+                    <div class="file-list" id="file-list"></div>
 
-                        <div class="file-list" id="file-list"></div>
+                    <button class="btn btn-primary" onclick="startRetraining()" id="retrain-btn" disabled>
+                        <i class="fas fa-play"></i> Start Retraining
+                    </button>
 
-                        <button class="btn btn-primary" onclick="startRetraining()" id="retrain-btn" disabled>
-                            <i class="fas fa-play"></i> Start Retraining
-                        </button>
-
-                        <div class="progress-container" id="progress-section" style="display: none;">
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="progress-fill" style="width: 0%">0%</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-cogs"></i>
-                        Training Logs
-                    </div>
-                    <div class="card-body">
-                        <div class="result-box" id="training-logs" style="min-height: 150px;">
-                            <p style="color: var(--text-light);">
-                                <i class="fas fa-info-circle"></i> Logs will appear here during retraining.
-                            </p>
+                    <div class="progress-container" id="progress-section" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width: 0%">0%</div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div id="about" style="margin-top: 4rem;">
-            <h2 class="section-title">
-                <i class="fas fa-info-circle"></i>
-                About This System
-            </h2>
 
             <div class="card">
                 <div class="card-header">
-                    <i class="fas fa-brain"></i>
-                    System Overview
+                    <i class="fas fa-cogs"></i>
+                    Training Logs
                 </div>
                 <div class="card-body">
-                    <p>
-                        The Avian Recognition System is machine learning pipeline designed at 
-                        the African Leadership University for intelligent classification of bird species through 
-                        acoustic analysis. It leverages deep neural networks, spectrogram feature extraction, 
-                        and automated preprocessing routines to offer a reliable identification experience.
-                    </p>
-                    <p>
-                        This platform supports single predictions, analytics dashboards, and full model retraining 
-                        with user uploaded datasets enabling continuous improvement of the classifier over time.
-                    </p>
+                    <div class="result-box" id="training-logs" style="min-height: 150px;">
+                        <p style="color: var(--text-light);">
+                            <i class="fas fa-info-circle"></i> Logs will appear here during retraining.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer>
-        © 2025 Avian Recognition System — Built for ALU Machine Learning Pipeline.
-    </footer>
+    <div id="about" style="margin-top: 4rem;">
+        <h2 class="section-title">
+            <i class="fas fa-info-circle"></i>
+            About This System
+        </h2>
 
-    <script>
-        const API_URL = 'http://localhost:5000/api';
-        let selectedFile = null;
-        let bulkFiles = [];
-        let confidenceChart = null;
-        let speciesChart = null;
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-brain"></i>
+                System Overview
+            </div>
+            <div class="card-body">
+                <p>
+                    The Avian Recognition System is a machine learning pipeline designed at 
+                    the African Leadership University for classification of bird species through 
+                    acoustic and visual analysis. It leverages deep neural networks, spectrogram feature extraction, 
+                    and automated preprocessing routines to offer a reliable identification experience.
+                </p>
+                <p>
+                    This platform supports single predictions from both audio, analytics dashboards with feature visualizations, and full model retraining 
+                    with user uploaded datasets enabling continuous improvement of the classifier over time.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            setupEventListeners();
-            loadMetrics();
-            setInterval(loadMetrics, 5000);
-        });
+<footer>
+    © 2025 Avian Recognition System — Built for ALU Machine Learning Pipeline.
+</footer>
 
-        function setupEventListeners() {
-            // Single file upload
-            const singleUpload = document.getElementById('single-upload');
-            const singleFile = document.getElementById('single-file');
-        
+<script>
+    const API_URL = 'http://localhost:5000/api';
+    let selectedFile = null;
+    let bulkFiles = [];
+    let confidenceChart = null;
+    let speciesChart = null;
+    let mfccChart = null;
+    let spectralChart = null;
+    let zcrChart = null;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        setupEventListeners();
+        loadMetrics();
+        loadFeatureAnalysis();
+        setInterval(loadMetrics, 5000);
+    });
+
+    function setupEventListeners() {
+        // Single file upload
+        const singleUpload = document.getElementById('single-upload');
+        const singleFile = document.getElementById('single-file');
+    
         singleUpload.addEventListener('click', () => singleFile.click());
         singleFile.addEventListener('change', handleSingleFile);
-        
+    
         // Bulk file upload
         const bulkUpload = document.getElementById('bulk-upload');
         const bulkFilesInput = document.getElementById('bulk-files');
-        
+    
         bulkUpload.addEventListener('click', () => bulkFilesInput.click());
         bulkFilesInput.addEventListener('change', handleBulkFiles);
-        
+    
         // Drag and drop for single
         singleUpload.addEventListener('dragover', (e) => {
             e.preventDefault();
             singleUpload.classList.add('dragover');
         });
-        
+    
         singleUpload.addEventListener('dragleave', () => {
             singleUpload.classList.remove('dragover');
         });
-        
+    
         singleUpload.addEventListener('drop', (e) => {
             e.preventDefault();
             singleUpload.classList.remove('dragover');
@@ -978,17 +1053,17 @@
                 handleSingleFile();
             }
         });
-        
+    
         // Drag and drop for bulk
         bulkUpload.addEventListener('dragover', (e) => {
             e.preventDefault();
             bulkUpload.classList.add('dragover');
         });
-        
+    
         bulkUpload.addEventListener('dragleave', () => {
             bulkUpload.classList.remove('dragover');
         });
-        
+    
         bulkUpload.addEventListener('drop', (e) => {
             e.preventDefault();
             bulkUpload.classList.remove('dragover');
@@ -1007,30 +1082,51 @@
             
             const uploadZone = document.getElementById('single-upload');
             uploadZone.querySelector('.upload-zone-title').textContent = selectedFile.name;
-            uploadZone.querySelector('.upload-zone-subtitle').textContent = 'File ready for prediction';
+            
+            // Check if it's an image file
+            if (selectedFile.type.startsWith('image/')) {
+                uploadZone.querySelector('.upload-zone-subtitle').textContent = 'Image ready for prediction';
+                showImagePreview(selectedFile);
+            } else {
+                uploadZone.querySelector('.upload-zone-subtitle').textContent = 'Audio file ready for prediction';
+                document.getElementById('image-preview-container').innerHTML = '';
+            }
         }
+    }
+
+    function showImagePreview(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('image-preview-container').innerHTML = `
+                <div style="text-align: center; margin-top: 1rem;">
+                    <img src="${e.target.result}" class="preview-image" alt="Preview" style="max-height: 300px;">
+                </div>
+            `;
+        };
+        reader.readAsDataURL(file);
     }
 
     function handleBulkFiles() {
         const fileInput = document.getElementById('bulk-files');
         bulkFiles = Array.from(fileInput.files);
-        
+    
         const fileList = document.getElementById('file-list');
         fileList.innerHTML = '';
-        
+    
         bulkFiles.forEach((file, index) => {
             const fileItem = document.createElement('div');
             fileItem.className = 'file-item';
+            const icon = file.type.startsWith('image/') ? 'fa-file-image' : 'fa-file-audio';
             fileItem.innerHTML = `
-                <i class="fas fa-file-audio"></i>
+                <i class="fas ${icon}"></i>
                 <span>${file.name}</span>
                 <span style="margin-left: auto; color: var(--text-light);">${(file.size / 1024).toFixed(2)} KB</span>
             `;
             fileList.appendChild(fileItem);
         });
-        
+    
         document.getElementById('retrain-btn').disabled = bulkFiles.length === 0;
-        
+    
         const uploadZone = document.getElementById('bulk-upload');
         uploadZone.querySelector('.upload-zone-title').textContent = `${bulkFiles.length} files selected`;
     }
@@ -1040,30 +1136,36 @@
             alert('Please select a file first');
             return;
         }
-        
+    
         const predictBtn = document.getElementById('predict-btn');
         const resultContainer = document.getElementById('result-container');
-        
+    
         predictBtn.disabled = true;
         predictBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
-        
+    
         const formData = new FormData();
-        formData.append('audio', selectedFile);
         
+        // Determine if it's an image or audio file
+        if (selectedFile.type.startsWith('image/')) {
+            formData.append('image', selectedFile);
+        } else {
+            formData.append('audio', selectedFile);
+        }
+    
         try {
             const response = await fetch(`${API_URL}/predict`, {
                 method: 'POST',
                 body: formData
             });
-            
+        
             if (!response.ok) {
                 throw new Error('Prediction failed');
             }
-            
+        
             const data = await response.json();
             displayResults(data);
             loadMetrics();
-            
+        
         } catch (error) {
             console.error('Error:', error);
             resultContainer.innerHTML = `
@@ -1080,7 +1182,7 @@
 
     function displayResults(data) {
         const resultContainer = document.getElementById('result-container');
-        
+    
         const top5Entries = Object.entries(data.top_5_predictions);
         const predictionsHTML = top5Entries.map(([species, confidence]) => `
             <div class="prediction-item">
@@ -1088,20 +1190,20 @@
                 <span class="prediction-confidence">${(confidence * 100).toFixed(2)}%</span>
             </div>
         `).join('');
-        
+    
         resultContainer.innerHTML = `
             <div class="result-box">
                 <div class="result-title">Predicted Species</div>
                 <div class="result-species">${data.predicted_species}</div>
-                
+            
                 <div class="confidence-display">
                     Confidence: <span class="confidence-value">${data.confidence_percent}</span>
                 </div>
-                
+            
                 <div class="confidence-bar">
                     <div class="confidence-fill" style="width: ${data.confidence * 100}%"></div>
                 </div>
-                
+            
                 <div class="result-title" style="margin-top: 2rem;">Top 5 Predictions</div>
                 <div class="predictions-list">
                     ${predictionsHTML}
@@ -1115,33 +1217,33 @@
             alert('Please upload files first');
             return;
         }
-        
+    
         const retrainBtn = document.getElementById('retrain-btn');
         const progressSection = document.getElementById('progress-section');
         const progressFill = document.getElementById('progress-fill');
         const trainingLogs = document.getElementById('training-logs');
-        
+    
         retrainBtn.disabled = true;
         progressSection.style.display = 'block';
-        
+    
         trainingLogs.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Uploading files...</p>';
-        
+    
         const formData = new FormData();
         bulkFiles.forEach(file => {
             formData.append('files', file);
         });
-        
+    
         try {
             // Upload files
             const uploadResponse = await fetch(`${API_URL}/upload_bulk`, {
                 method: 'POST',
                 body: formData
             });
-            
+        
             if (!uploadResponse.ok) {
                 throw new Error('Upload failed');
             }
-            
+        
             const uploadData = await uploadResponse.json();
             trainingLogs.innerHTML = `
                 <div class="alert alert-success">
@@ -1149,21 +1251,21 @@
                     <div>${uploadData.message}</div>
                 </div>
             `;
-            
+        
             // Start retraining
             trainingLogs.innerHTML += '<p><i class="fas fa-spinner fa-spin"></i> Starting retraining process...</p>';
-            
+        
             const retrainResponse = await fetch(`${API_URL}/trigger_retrain`, {
                 method: 'POST'
             });
-            
+        
             if (!retrainResponse.ok) {
                 throw new Error('Retraining failed');
             }
-            
+        
             // Monitor progress
             monitorRetrainingProgress();
-            
+        
         } catch (error) {
             console.error('Error:', error);
             trainingLogs.innerHTML = `
@@ -1181,15 +1283,15 @@
         const progressFill = document.getElementById('progress-fill');
         const trainingLogs = document.getElementById('training-logs');
         const retrainBtn = document.getElementById('retrain-btn');
-        
+    
         const interval = setInterval(async () => {
             try {
                 const response = await fetch(`${API_URL}/retrain_status`);
                 const data = await response.json();
-                
+            
                 progressFill.style.width = `${data.progress}%`;
                 progressFill.textContent = `${data.progress}%`;
-                
+            
                 if (data.progress === 100) {
                     clearInterval(interval);
                     trainingLogs.innerHTML = `
@@ -1200,7 +1302,8 @@
                     `;
                     retrainBtn.disabled = false;
                     loadMetrics();
-                    
+                    loadFeatureAnalysis();
+                
                     setTimeout(() => {
                         document.getElementById('progress-section').style.display = 'none';
                     }, 3000);
@@ -1224,10 +1327,10 @@
         try {
             const response = await fetch(`${API_URL}/metrics`);
             const data = await response.json();
-            
+        
             document.getElementById('total-pred').textContent = data.total_predictions;
             document.getElementById('avg-conf').textContent = `${(data.avg_confidence * 100).toFixed(1)}%`;
-            
+        
             updateCharts(data);
         } catch (error) {
             console.error('Error loading metrics:', error);
@@ -1237,13 +1340,13 @@
     function updateCharts(data) {
         // Confidence chart
         const confCtx = document.getElementById('confidence-chart').getContext('2d');
-        
+    
         if (confidenceChart) {
             confidenceChart.destroy();
         }
-        
+    
         const recentPreds = data.recent_predictions.slice(-10);
-        
+    
         confidenceChart = new Chart(confCtx, {
             type: 'line',
             data: {
@@ -1276,18 +1379,18 @@
                 }
             }
         });
-        
+    
         // Species chart
         const specCtx = document.getElementById('species-chart').getContext('2d');
-        
+    
         if (speciesChart) {
             speciesChart.destroy();
         }
-        
+    
         const speciesData = Object.entries(data.species_distribution)
             .sort((a, b) => b[1] - a[1])
             .slice(0, 8);
-        
+    
         speciesChart = new Chart(specCtx, {
             type: 'bar',
             data: {
@@ -1317,172 +1420,159 @@
             }
         });
     }
-    // ADD THESE FUNCTIONS BEFORE THE CLOSING </script> TAG
 
-let mfccChart = null;
-let spectralChart = null;
-let zcrChart = null;
-
-async function loadFeatureAnalysis() {
-    try {
-        const response = await fetch(`${API_URL}/feature_analysis`);
-        const data = await response.json();
+    async function loadFeatureAnalysis() {
+        try {
+            const response = await fetch(`${API_URL}/feature_analysis`);
+            const data = await response.json();
         
-        if (data.error) {
+            if (data.error) {
+                document.getElementById('feature-content').innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>${data.error}</div>
+                    </div>
+                `;
+                return;
+            }
+        
+            // Update MFCC Chart
+            const mfccCtx = document.getElementById('mfcc-chart').getContext('2d');
+            if (mfccChart) mfccChart.destroy();
+        
+            mfccChart = new Chart(mfccCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.mfcc_analysis.labels,
+                    datasets: [{
+                        label: 'MFCC Mean Values',
+                        data: data.mfcc_analysis.values,
+                        backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: { display: true, text: 'MFCC Value' }
+                        }
+                    }
+                }
+            });
+        
+            document.getElementById('mfcc-description').innerHTML = `
+                <p style="color: var(--text); font-weight: 600; margin-bottom: 0.5rem;">
+                    ${data.mfcc_analysis.description}
+                </p>
+                <p style="color: var(--text-light); font-size: 0.9rem;">
+                    ${data.mfcc_analysis.interpretation}
+                </p>
+            `;
+        
+            // Update Spectral Centroid Chart
+            const specCtx = document.getElementById('spectral-chart').getContext('2d');
+            if (spectralChart) spectralChart.destroy();
+        
+            spectralChart = new Chart(specCtx, {
+                type: 'line',
+                data: {
+                    labels: data.spectral_centroid.labels,
+                    datasets: [{
+                        label: 'Spectral Centroid (Hz)',
+                        data: data.spectral_centroid.values,
+                        borderColor: 'rgba(236, 72, 153, 1)',
+                        backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: { display: true, text: 'Frequency (Hz)' }
+                        }
+                    }
+                }
+            });
+        
+            document.getElementById('spectral-description').innerHTML = `
+                <p style="color: var(--text); font-weight: 600; margin-bottom: 0.5rem;">
+                    ${data.spectral_centroid.description}
+                </p>
+                <p style="color: var(--text-light); font-size: 0.9rem;">
+                    ${data.spectral_centroid.interpretation}
+                </p>
+            `;
+        
+            // Update ZCR Chart
+            const zcrCtx = document.getElementById('zcr-chart').getContext('2d');
+            if (zcrChart) zcrChart.destroy();
+        
+            zcrChart = new Chart(zcrCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.zcr_analysis.labels,
+                    datasets: [{
+                        label: 'Zero Crossing Rate',
+                        data: data.zcr_analysis.values,
+                        backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'ZCR Value' }
+                        }
+                    }
+                }
+            });
+        
+            document.getElementById('zcr-description').innerHTML = `
+                <p style="color: var(--text); font-weight: 600; margin-bottom: 0.5rem;">
+                    ${data.zcr_analysis.description}
+                </p>
+                <p style="color: var(--text-light); font-size: 0.9rem;">
+                    ${data.zcr_analysis.interpretation}
+                </p>
+            `;
+        
             document.getElementById('feature-content').innerHTML = `
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div>${data.error}</div>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <div>Feature analysis loaded successfully! Analyzed ${data.summary.total_samples} audio samples.</div>
                 </div>
             `;
-            return;
+        
+        } catch (error) {
+            console.error('Error loading features:', error);
+            document.getElementById('feature-content').innerHTML = `
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div>Failed to load feature analysis. Make sure you have uploaded training data.</div>
+                </div>
+            `;
         }
-        
-        // Update MFCC Chart
-        const mfccCtx = document.getElementById('mfcc-chart').getContext('2d');
-        if (mfccChart) mfccChart.destroy();
-        
-        mfccChart = new Chart(mfccCtx, {
-            type: 'bar',
-            data: {
-                labels: data.mfcc_analysis.labels,
-                datasets: [{
-                    label: 'MFCC Mean Values',
-                    data: data.mfcc_analysis.values,
-                    backgroundColor: 'rgba(99, 102, 241, 0.7)',
-                    borderColor: 'rgba(99, 102, 241, 1)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: true }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        title: { display: true, text: 'MFCC Value' }
-                    }
-                }
-            }
-        });
-        
-        document.getElementById('mfcc-description').innerHTML = `
-            <p style="color: var(--text); font-weight: 600; margin-bottom: 0.5rem;">
-                ${data.mfcc_analysis.description}
-            </p>
-            <p style="color: var(--text-light); font-size: 0.9rem;">
-                ${data.mfcc_analysis.interpretation}
-            </p>
-        `;
-        
-        // Update Spectral Centroid Chart
-        const specCtx = document.getElementById('spectral-chart').getContext('2d');
-        if (spectralChart) spectralChart.destroy();
-        
-        spectralChart = new Chart(specCtx, {
-            type: 'line',
-            data: {
-                labels: data.spectral_centroid.labels,
-                datasets: [{
-                    label: 'Spectral Centroid (Hz)',
-                    data: data.spectral_centroid.values,
-                    borderColor: 'rgba(236, 72, 153, 1)',
-                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                    borderWidth: 3,
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: true }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        title: { display: true, text: 'Frequency (Hz)' }
-                    }
-                }
-            }
-        });
-        
-        document.getElementById('spectral-description').innerHTML = `
-            <p style="color: var(--text); font-weight: 600; margin-bottom: 0.5rem;">
-                ${data.spectral_centroid.description}
-            </p>
-            <p style="color: var(--text-light); font-size: 0.9rem;">
-                ${data.spectral_centroid.interpretation}
-            </p>
-        `;
-        
-        // Update ZCR Chart
-        const zcrCtx = document.getElementById('zcr-chart').getContext('2d');
-        if (zcrChart) zcrChart.destroy();
-        
-        zcrChart = new Chart(zcrCtx, {
-            type: 'bar',
-            data: {
-                labels: data.zcr_analysis.labels,
-                datasets: [{
-                    label: 'Zero Crossing Rate',
-                    data: data.zcr_analysis.values,
-                    backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                    borderColor: 'rgba(16, 185, 129, 1)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: true }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: { display: true, text: 'ZCR Value' }
-                    }
-                }
-            }
-        });
-        
-        document.getElementById('zcr-description').innerHTML = `
-            <p style="color: var(--text); font-weight: 600; margin-bottom: 0.5rem;">
-                ${data.zcr_analysis.description}
-            </p>
-            <p style="color: var(--text-light); font-size: 0.9rem;">
-                ${data.zcr_analysis.interpretation}
-            </p>
-        `;
-        
-        document.getElementById('feature-content').innerHTML = `
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i>
-                <div>Feature analysis loaded successfully! Analyzed ${data.summary.total_samples} audio samples.</div>
-            </div>
-        `;
-        
-    } catch (error) {
-        console.error('Error loading features:', error);
-        document.getElementById('feature-content').innerHTML = `
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-circle"></i>
-                <div>Failed to load feature analysis. Make sure you have uploaded training data.</div>
-            </div>
-        `;
     }
-}
-
-// Auto-load on page load
-document.addEventListener('DOMContentLoaded', function() {
-    setupEventListeners();
-    loadMetrics();
-    loadFeatureAnalysis(); // Auto-load feature analysis
-    setInterval(loadMetrics, 5000);
-});
 </script>
