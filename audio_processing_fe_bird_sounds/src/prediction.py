@@ -35,7 +35,7 @@ class BirdSoundPredictor:
         # Load label encoder
         if os.path.exists(encoder_path):
             self.label_encoder = pickle.load(open(encoder_path, 'rb'))
-            print(f"✓ Label encoder loaded from {encoder_path}")
+            print(f"Label encoder loaded from {encoder_path}")
         else:
             print(f"ERROR: Label encoder not found at {encoder_path}")
     
@@ -163,11 +163,11 @@ class BirdSoundPredictor:
         for audio_file in audio_files:
             file_path = os.path.join(audio_folder_path, audio_file)
             
-            # Convert mp3 → wav if needed
+            # Convert mp3 
             if file_path.lower().endswith('.mp3'):
                 file_path = self.convert_mp3_to_wav(file_path)
                 if not file_path:
-                    continue  # skip if conversion failed
+                    continue 
             
             result = self.predict(file_path)
             if result:
@@ -178,7 +178,7 @@ class BirdSoundPredictor:
 
 
 if __name__ == "__main__":
-    # Paths to your files
+    # Paths to my files
     MODEL_PATH = r"C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\models\final_model.h5"
     SCALER_PATH = r"C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\models\scaler.pkl"
     ENCODER_PATH = r"C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\models\label_encoder.pkl"

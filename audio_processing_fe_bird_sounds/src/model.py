@@ -1,8 +1,3 @@
-"""
-MODEL MODULE - model.py
-Extracted from notebook for bird sound classification
-Complete neural network architecture and training pipeline
-"""
 
 import os
 import numpy as np
@@ -64,9 +59,8 @@ class BirdSoundClassifier:
             metrics=['accuracy', keras.metrics.Precision(), keras.metrics.Recall()]
         )
         
-        print("=" * 80)
+       
         print("MODEL ARCHITECTURE")
-        print("=" * 80)
         self.model.summary()
         return self.model
     
@@ -166,9 +160,9 @@ class BirdSoundClassifier:
     def evaluate_on_test_set(self, X_test, y_test, label_encoder):
         """Evaluate model on test set with detailed metrics"""
         
-        print("\n" + "=" * 80)
+        
         print("MODEL EVALUATION ON TEST SET")
-        print("=" * 80)
+      
         
         # Predictions
         y_pred_probs = self.model.predict(X_test, verbose=0)
@@ -267,7 +261,7 @@ class BirdSoundClassifier:
 
 
 if __name__ == "__main__":
-    # Example usage
+    # usage
     classifier = BirdSoundClassifier(input_dim=95, num_classes=64)
     classifier.build_model()
     print("\nModel built successfully!")

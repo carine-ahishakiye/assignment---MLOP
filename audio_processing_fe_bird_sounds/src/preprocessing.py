@@ -22,14 +22,14 @@ class AudioProcessor:
     def load_and_trim_audio(self, file_path, max_duration=10):
         """Load MP3 audio and trim silence, skip corrupted files quickly"""
         try:
-            # Load only first `max_duration` seconds to avoid freezing
+            # Load only first  seconds to avoid freezing
             data, sample_rate = librosa.load(file_path, sr=self.sr, duration=max_duration)
             trimmed_data, _ = librosa.effects.trim(data, top_db=self.top_db)
             if len(trimmed_data) < self.sr * 0.5:
                 return None, None
             return trimmed_data, sample_rate
         except Exception:
-            # Skip problematic/corrupted MP3s
+            # Skip problematic
             return None, None
     
     def extract_features(self, audio_data):
@@ -156,9 +156,9 @@ class DataProcessor:
                     skipped_files.append(file_path)
                     continue
         
-        print(f"\n✓ Processed: {len(features_list)} samples from {len(np.unique(labels_list))} species")
+        print(f"\nProcessed: {len(features_list)} samples from {len(np.unique(labels_list))} species")
         if skipped_files:
-            print(f"⚠️ Skipped {len(skipped_files)} files due to errors or invalid audio")
+            print(f" Skipped {len(skipped_files)} files due to errors or invalid audio")
             with open("skipped_files.txt", "w") as f:
                 for path in skipped_files:
                     f.write(path + "\n")

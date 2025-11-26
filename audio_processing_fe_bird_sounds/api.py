@@ -25,7 +25,7 @@ SCALER_PATH = r'C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_s
 ENCODER_PATH = r'C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\models\label_encoder.pkl'
 ALLOWED_EXTENSIONS = {'wav', 'mp3'}
 
-# Create necessary directories
+# Creating necessary directories
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RETRAIN_FOLDER, exist_ok=True)
 
@@ -209,12 +209,12 @@ def retrain_model_background():
         state.retrain_progress = 30
         time.sleep(2)
         
-        #  Process audio files (simulated)
+        #  Process audio files 
         print("Processing audio files...")
         state.retrain_progress = 50
         time.sleep(2)
         
-        #  Retrain model (simulated)
+        #  Retrain model 
         print("Retraining model...")
         state.retrain_progress = 80
         time.sleep(2)
@@ -367,7 +367,7 @@ def trigger_retrain():
     if state.is_retraining:
         return jsonify({'error': 'Retraining already in progress'}), 400
     
-    # Check if we have files to retrain on
+    # Check if I have files to retrain on
     audio_files = [f for f in os.listdir(RETRAIN_FOLDER) 
                   if f.lower().endswith(('.wav', '.mp3'))]
     
@@ -416,11 +416,193 @@ def not_found(error):
 @app.errorhandler(500)
 def internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
+@app.route('/api/feature_analysis', methods=['GET'])
+def feature_analysis():
+    """Analyze 3 key features from the dataset"""
+    try:
+        # Sample audio files from retrain folder to analyze
+        audio_files = [f for f in os.listdir(RETRAIN_FOLDER) if f.lower().endswith(('.wav', '.mp3'))]
+        
+        if len(audio_files) < 5:
+            return jsonify({
+                'error': 'Not enough audio files for analysis. Upload at least 5 files.',
+                'mfcc_analysis': {'values': [], 'labels': []},
+                'spectral_centroid': {'values': [], 'labels': []},
+                'zcr_analysis': {'values': [], 'labels': []}
+            })
+        
+        # Analyze up to 20 random files
+        sample_files = np.random.choice(audio_files, min(20, len(audio_files)), replace=False)
+        
+        mfcc_means = []
+        spectral_centroids = []
+        zcr_means = []
+        labels = []
+        
+        for audio_file in sample_files:
+            try:
+                file_path = os.path.join(RETRAIN_FOLDER, audio_file)
+                y, sr = librosa.load(file_path, sr=22050, duration=10)
+                y_trimmed, _ = librosa.effects.trim(y, top_db=23)
+                
+                if len(y_trimmed) < sr * 0.5:
+                    continue
+                
+                # Extract features
+                mfccs = librosa.feature.mfcc(y=y_trimmed, sr=sr, n_mfcc=20)
+                mfcc_mean = float(np.mean(mfccs))
+                
+                sc = librosa.feature.spectral_centroid(y=y_trimmed, sr=sr)
+                sc_mean = float(np.mean(sc))
+                
+                zcr = librosa.feature.zero_crossing_rate(y_trimmed)
+                zcr_mean = float(np.mean(zcr))
+                
+                mfcc_means.append(mfcc_mean)
+                spectral_centroids.append(sc_mean)
+                zcr_means.append(zcr_mean)
+                labels.append(audio_file[:20])  # Truncate filename for display
+                
+            except Exception as e:
+                print(f"Error analyzing {audio_file}: {e}")
+                continue
+        
+        return jsonify({
+            'mfcc_analysis': {
+                'values': mfcc_means,
+                'labels': labels,
+                'description': 'MFCC (Mel-frequency cepstral coefficients) represents the short-term power spectrum of sound. Higher values indicate more complex frequency patterns, typical of bird calls with rich harmonics.',
+                'interpretation': f'Average MFCC: {np.mean(mfcc_means):.2f}. This shows the spectral envelope of the audio signals.'
+            },
+            'spectral_centroid': {
+                'values': spectral_centroids,
+                'labels': labels,
+                'description': 'Spectral Centroid indicates where the "center of mass" of the spectrum is located. Higher values suggest brighter sounds with more high-frequency content.',
+                'interpretation': f'Average Spectral Centroid: {np.mean(spectral_centroids):.2f} Hz. This indicates the brightness of the bird calls in your dataset.'
+            },
+            'zcr_analysis': {
+                'values': zcr_means,
+                'labels': labels,
+                'description': 'Zero Crossing Rate measures how often the signal changes from positive to negative. Higher values indicate noisier, more percussive sounds.',
+                'interpretation': f'Average ZCR: {np.mean(zcr_means):.4f}. This reflects the noisiness and texture of the bird sounds.'
+            },
+            'summary': {
+                'total_samples': len(mfcc_means),
+                'mfcc_range': [float(np.min(mfcc_means)), float(np.max(mfcc_means))],
+                'sc_range': [float(np.min(spectral_centroids)), float(np.max(spectral_centroids))],
+                'zcr_range': [float(np.min(zcr_means)), float(np.max(zcr_means))]
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'error': f'Feature analysis failed: {str(e)}',
+            'mfcc_analysis': {'values': [], 'labels': []},
+            'spectral_centroid': {'values': [], 'labels': []},
+            'zcr_analysis': {'values': [], 'labels': []}
+        }), 500
+
+
+@app.route('/api/model_performance', methods=['GET'])
+def model_performance():
+    """Get detailed model performance metrics"""
+    try:
+        if len(state.prediction_history) == 0:
+            return jsonify({
+                'error': 'No predictions made yet',
+                'performance': {}
+            })
+        
+        # Calculate performance metrics
+        confidences = [p['confidence'] for p in state.prediction_history]
+        species_counts = {}
+        
+        for pred in state.prediction_history:
+            species = pred['species']
+            species_counts[species] = species_counts.get(species, 0) + 1
+        
+        # Get top 5 predicted species
+        top_species = sorted(species_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+        
+        return jsonify({
+            'total_predictions': len(state.prediction_history),
+            'average_confidence': float(np.mean(confidences)),
+            'median_confidence': float(np.median(confidences)),
+            'std_confidence': float(np.std(confidences)),
+            'min_confidence': float(np.min(confidences)),
+            'max_confidence': float(np.max(confidences)),
+            'confidence_distribution': {
+                'high': len([c for c in confidences if c > 0.8]),
+                'medium': len([c for c in confidences if 0.5 <= c <= 0.8]),
+                'low': len([c for c in confidences if c < 0.5])
+            },
+            'top_predicted_species': [
+                {'species': species, 'count': count} for species, count in top_species
+            ],
+            'unique_species_predicted': len(species_counts),
+            'model_version': state.model_version,
+            'uptime_hours': state.get_uptime() / 3600
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Performance analysis failed: {str(e)}'}), 500
+
+
+@app.route('/api/system_stats', methods=['GET'])
+def system_stats():
+    """Get comprehensive system statistics"""
+    try:
+        import psutil
+        
+        # System resources
+        cpu_percent = psutil.cpu_percent(interval=1)
+        memory = psutil.virtual_memory()
+        disk = psutil.disk_usage('/')
+        
+        return jsonify({
+            'system': {
+                'cpu_usage': cpu_percent,
+                'memory_usage': memory.percent,
+                'memory_available_gb': memory.available / (1024**3),
+                'disk_usage': disk.percent,
+                'disk_free_gb': disk.free / (1024**3)
+            },
+            'application': {
+                'uptime_seconds': state.get_uptime(),
+                'total_requests': state.request_count,
+                'error_count': state.error_count,
+                'error_rate': (state.error_count / state.request_count * 100) if state.request_count > 0 else 0,
+                'model_version': state.model_version,
+                'is_retraining': state.is_retraining
+            },
+            'model': {
+                'total_predictions': state.metrics['total_predictions'],
+                'avg_confidence': float(state.metrics['avg_confidence']) if state.metrics['avg_confidence'] else 0,
+                'unique_species': len(state.metrics['species_distribution']),
+                'last_prediction': state.prediction_history[-1] if state.prediction_history else None
+            },
+            'storage': {
+                'upload_folder_files': len(os.listdir(UPLOAD_FOLDER)) if os.path.exists(UPLOAD_FOLDER) else 0,
+                'retrain_folder_files': len(os.listdir(RETRAIN_FOLDER)) if os.path.exists(RETRAIN_FOLDER) else 0
+            }
+        })
+        
+    except ImportError:
+        return jsonify({
+            'error': 'psutil not installed. Run: pip install psutil',
+            'application': {
+                'uptime_seconds': state.get_uptime(),
+                'total_requests': state.request_count,
+                'error_count': state.error_count
+            }
+        })
+    except Exception as e:
+        return jsonify({'error': f'System stats failed: {str(e)}'}), 500
 
 # Run Server 
 if __name__ == '__main__':
     print("\n" + "="*60)
-    print("🐦 Bird Sound Classification API")
+    print(" Bird Sound Classification API")
     print(f"Model Path: {MODEL_PATH}")
     print(f"Scaler Path: {SCALER_PATH}")
     print(f"Encoder Path: {ENCODER_PATH}")

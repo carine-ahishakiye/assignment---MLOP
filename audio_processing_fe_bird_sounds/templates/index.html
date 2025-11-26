@@ -3,371 +3,558 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bird Sound Classification System</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Avian Classification System - ALU ML Pipeline</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
+        :root {
+            --primary: #1a1f3a;
+            --secondary: #0f766e;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #059669;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #6366f1 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            color: var(--text);
+            line-height: 1.6;
             min-height: 100vh;
-            padding: 0;
-            overflow-x: hidden;
         }
 
-        .background-pattern {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.03;
-            background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0);
-            background-size: 40px 40px;
-            pointer-events: none;
-            z-index: 0;
-        }
-        
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 0 20px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        header {
-            text-align: center;
-            color: white;
-            padding: 60px 20px 40px;
-            position: relative;
-        }
-
-        .header-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.15);
+        nav {
+            background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(10px);
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        h1 {
-            font-size: 3.5em;
-            margin-bottom: 15px;
-            font-weight: 700;
-            letter-spacing: -1px;
-            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+            padding: 1.25rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .subtitle {
-            font-size: 1.2em;
-            opacity: 0.9;
-            font-weight: 300;
-        }
-        
-        .status-bar {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            padding: 25px 30px;
-            border-radius: 16px;
-            margin-bottom: 30px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 25px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-        
-        .status-item {
-            text-align: center;
-            padding: 10px;
-            transition: transform 0.2s;
-        }
-
-        .status-item:hover {
-            transform: translateY(-2px);
-        }
-        
-        .status-label {
-            font-size: 0.8em;
-            color: #64748b;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-        }
-        
-        .status-value {
-            font-size: 1.8em;
-            font-weight: 700;
-            background: linear-gradient(135deg, #3730a3, #6366f1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-            position: relative;
-        }
-        
-        .status-healthy {
-            background: #10b981;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-            animation: pulse 2s infinite;
-        }
-
-        .status-healthy::after {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: #10b981;
-            border-radius: 50%;
-            opacity: 0.3;
-            animation: ping 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        @keyframes ping {
-            0% { transform: scale(1); opacity: 0.5; }
-            100% { transform: scale(1.5); opacity: 0; }
-        }
-        
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-        
-        .card {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border-radius: 16px;
-            padding: 35px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        }
-        
-        .card h2 {
-            background: linear-gradient(135deg, #3730a3, #6366f1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 25px;
-            font-size: 1.6em;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .upload-area {
-            border: 3px dashed #cbd5e1;
-            border-radius: 12px;
-            padding: 50px 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: #f8fafc;
-        }
-        
-        .upload-area:hover {
-            background: linear-gradient(135deg, rgba(55, 48, 163, 0.05), rgba(99, 102, 241, 0.05));
-            border-color: #6366f1;
-            transform: scale(1.02);
-        }
-        
-        .upload-area.dragover {
-            background: linear-gradient(135deg, rgba(55, 48, 163, 0.1), rgba(99, 102, 241, 0.1));
-            border-color: #3730a3;
-            border-style: solid;
-        }
-
-        .upload-icon {
-            font-size: 4em;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .upload-area strong {
-            color: #1e293b;
-            font-size: 1.1em;
-        }
-
-        .upload-area p {
-            margin: 8px 0;
-        }
-
-        .upload-area .file-info {
-            color: #64748b;
-            font-size: 0.9em;
-        }
-        
-        input[type="file"] {
-            display: none;
-        }
-        
-        button {
-            background: linear-gradient(135deg, #3730a3 0%, #6366f1 100%);
-            color: white;
-            border: none;
-            padding: 14px 35px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: all 0.3s;
-            margin: 8px 5px;
-            box-shadow: 0 4px 15px rgba(55, 48, 163, 0.3);
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(55, 48, 163, 0.4);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-        
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .result {
-            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-            padding: 25px;
-            border-radius: 12px;
-            margin-top: 20px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .result h3 {
-            color: #1e293b;
-            margin-bottom: 15px;
-            font-size: 1.4em;
-        }
-
-        .result p {
-            color: #475569;
-            margin: 10px 0;
-            font-size: 1.05em;
-        }
-
-        .result h4 {
-            color: #334155;
-            margin-top: 25px;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-        
-        .result-item {
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
             display: flex;
             justify-content: space-between;
-            padding: 12px 15px;
-            background: white;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s;
+            align-items: center;
         }
 
-        .result-item:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-            transform: translateX(5px);
-        }
-
-        .result-item span:first-child {
-            font-weight: 600;
-            color: #334155;
-        }
-
-        .result-item span:last-child {
+        .logo {
+            font-size: 1.8rem;
             font-weight: 700;
-            color: #6366f1;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
         }
-        
-        .confidence-bar {
-            width: 100%;
-            height: 12px;
-            background: #e2e8f0;
-            border-radius: 6px;
-            overflow: hidden;
-            margin-top: 10px;
+
+        .logo i {
+            color: var(--secondary);
         }
-        
-        .confidence-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #3730a3, #6366f1);
-            transition: width 0.6s ease-out;
-            box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.3);
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
         }
-        
-        .chart-container {
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #164e63 100%);
+            color: white;
+            padding: 5rem 2rem;
+            text-align: center;
             position: relative;
-            height: 320px;
-            margin-top: 25px;
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 40px;
-            background: #e2e8f0;
-            border-radius: 20px;
             overflow: hidden;
-            margin: 20px 0;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #10b981, #059669);
-            transition: width 0.5s;
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(6, 78, 59, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.35rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+        }
+
+        .hero-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+            padding-top: 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .meta-item {
+            text-align: center;
+        }
+
+        .meta-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .meta-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-section {
+            max-width: 1400px;
+            margin: -2rem auto 0;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .status-card {
+            background: white;
+            padding: 1.75rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .status-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .status-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: 700;
-            font-size: 1.1em;
+            font-size: 1.5rem;
         }
-        
+
+        .status-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .status-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-title i {
+            color: var(--accent);
+            font-size: 1.8rem;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.75rem;
+            font-size: 1.35rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .card-body p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--light);
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--secondary);
+            background: rgba(15, 118, 110, 0.05);
+            transform: scale(1.01);
+        }
+
+        .upload-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .upload-icon {
+            font-size: 3.5rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .upload-zone-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-zone-subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.95rem 1.75rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            text-decoration: none;
+            text-align: center;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 15px rgba(6, 78, 59, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(6, 78, 59, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+            border-color: var(--text-light);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 1.25rem 1.75rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            font-weight: 500;
+            border-left: 4px solid;
+        }
+
+        .alert i {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 0.2rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: var(--accent);
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #7f1d1d;
+            border-color: var(--danger);
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e3a8a;
+            border-color: #3b82f6;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: var(--warning);
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, var(--light), #ffffff);
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-top: 1.5rem;
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        .result-species {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 1rem 0;
+        }
+
+        .confidence-display {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin: 1.5rem 0;
+        }
+
+        .confidence-value {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 1.4rem;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 20px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0 2rem 0;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+
+        .predictions-list {
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .prediction-item:hover {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .prediction-name {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .prediction-confidence {
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin-top: 1.5rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
         .file-list {
-            max-height: 240px;
+            max-height: 250px;
             overflow-y: auto;
-            margin-top: 20px;
-            padding-right: 5px;
+            margin-top: 1.5rem;
+            padding-right: 0.5rem;
         }
 
         .file-list::-webkit-scrollbar {
@@ -375,446 +562,927 @@
         }
 
         .file-list::-webkit-scrollbar-track {
-            background: #f1f5f9;
+            background: var(--light);
             border-radius: 4px;
         }
 
         .file-list::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
+            background: var(--border);
             border-radius: 4px;
         }
 
         .file-list::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+            background: var(--text-light);
         }
-        
+
         .file-item {
-            padding: 12px 15px;
-            background: white;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            font-size: 0.95em;
-            border: 1px solid #e2e8f0;
-            color: #334155;
+            padding: 0.85rem 1rem;
+            background: var(--light);
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 0.9rem;
+            color: var(--text);
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
 
         .file-item:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
+            background: rgba(16, 185, 129, 0.05);
+            border-color: var(--accent);
         }
-        
-        .alert {
-            padding: 18px 22px;
-            border-radius: 10px;
-            margin: 20px 0;
-            font-weight: 500;
-            border: 1px solid;
+
+        .progress-container {
+            margin: 1.5rem 0;
         }
-        
-        .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border-color: #6ee7b7;
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: var(--border);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border-color: #fca5a5;
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.85rem;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
         }
-        
-        .alert-info {
-            background: #dbeafe;
-            color: #1e40af;
-            border-color: #93c5fd;
+
+        footer {
+            background: var(--primary);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
         }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5em;
+            .hero h1 {
+                font-size: 2.2rem;
             }
 
-            .grid {
+            .card-grid {
                 grid-template-columns: 1fr;
             }
 
-            .status-bar {
-                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-                gap: 15px;
-                padding: 20px;
+            .nav-links {
+                gap: 1.5rem;
+                font-size: 0.85rem;
             }
 
-            .card {
-                padding: 25px;
+            .status-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .hero-meta {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .upload-zone {
+                padding: 2rem 1rem;
+            }
+
+            .upload-icon {
+                font-size: 2.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="background-pattern"></div>
-    <div class="container">
-        <header>
-            <div class="header-badge">🎓 ALU Machine Learning Pipeline Project</div>
-            <h1>🐦 Bird Sound Classification</h1>
-            <p class="subtitle">AI-Powered Avian Species Recognition System</p>
-        </header>
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-feather"></i>
+                Avian Recognition System
+            </a>
+            <ul class="nav-links">
+    <li><a href="#predict">Predict</a></li>
+    <li><a href="#analytics">Analytics</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#retrain">Retrain</a></li>
+    <li><a href="#about">About</a></li>
+</ul>
+        </div>
+    </nav>
 
-        <div class="status-bar">
-            <div class="status-item">
-                <div class="status-label">System Status</div>
-                <div class="status-value">
-                    <span class="status-indicator status-healthy"></span>
-                    <span id="system-status">Healthy</span>
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-certificate"></i> African Leadership University ML Pipeline
+            </div>
+            <h1>Intelligent Bird Species Classification</h1>
+            <p class="hero-subtitle">Advanced audio analysis for automated avian identification</p>
+            
+            <div class="hero-meta">
+                <div class="meta-item">
+                    <span class="meta-value">64</span>
+                    <span class="meta-label">Species Supported</span>
                 </div>
-            </div>
-            <div class="status-item">
-                <div class="status-label">Uptime</div>
-                <div class="status-value" id="uptime">0s</div>
-            </div>
-            <div class="status-item">
-                <div class="status-label">Model Version</div>
-                <div class="status-value" id="model-version">v1.1</div>
-            </div>
-            <div class="status-item">
-                <div class="status-label">Total Predictions</div>
-                <div class="status-value" id="total-predictions">0</div>
-            </div>
-            <div class="status-item">
-                <div class="status-label">Avg Confidence</div>
-                <div class="status-value" id="avg-confidence">0%</div>
+                <div class="meta-item">
+                    <span class="meta-value">45ms</span>
+                    <span class="meta-label">Avg Response Time</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-value">1600+</span>
+                    <span class="meta-label">Training Samples</span>
+                </div>
             </div>
         </div>
+    </section>
 
-        <div class="grid">
-            <div class="card">
-                <h2>🎵 Single Prediction</h2>
-                <div class="upload-area" id="single-upload" onclick="document.getElementById('single-file').click()">
-                    <span class="upload-icon">📁</span>
-                    <p><strong>Click to upload</strong> or drag and drop</p>
-                    <p class="file-info">WAV or MP3 audio files only</p>
-                </div>
-                <input type="file" id="single-file" accept=".wav,.mp3" onchange="handleSingleFile(this.files[0])">
-                <button onclick="predictSingle()" id="predict-btn" disabled>🔍 Predict Species</button>
-                <div id="single-result"></div>
-            </div>
-
-            <div class="card">
-                <h2>📊 Species Distribution</h2>
-                <div class="chart-container">
-                    <canvas id="species-chart"></canvas>
+    <div class="status-section">
+        <div class="status-grid">
+            <div class="status-card">
+                <div class="status-header">
+                    <div>
+                        <div class="status-label">System Status</div>
+                        <div class="status-value"><span class="status-indicator"></span> Active</div>
+                    </div>
+                    <div class="status-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
                 </div>
             </div>
 
-            <div class="card">
-                <h2>📈 Prediction Confidence Trend</h2>
-                <div class="chart-container">
-                    <canvas id="confidence-chart"></canvas>
+            <div class="status-card">
+                <div class="status-header">
+                    <div>
+                        <div class="status-label">Model Version</div>
+                        <div class="status-value" id="model-version">v1.1</div>
+                    </div>
+                    <div class="status-icon">
+                        <i class="fas fa-cube"></i>
+                    </div>
                 </div>
             </div>
 
-            <div class="card">
-                <h2>📦 Bulk Upload & Model Retraining</h2>
-                <div class="upload-area" id="bulk-upload" onclick="document.getElementById('bulk-files').click()">
-                    <span class="upload-icon">📂</span>
-                    <p><strong>Upload multiple files</strong> for model retraining</p>
-                    <p class="file-info">Select multiple WAV/MP3 audio files</p>
+            <div class="status-card">
+                <div class="status-header">
+                    <div>
+                        <div class="status-label">Total Predictions</div>
+                        <div class="status-value" id="total-pred">0</div>
+                    </div>
+                    <div class="status-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
                 </div>
-                <input type="file" id="bulk-files" accept=".wav,.mp3" multiple onchange="handleBulkFiles(this.files)">
-                <div id="file-list" class="file-list"></div>
-                <button onclick="uploadBulkFiles()" id="upload-btn" disabled>⬆️ Upload Files</button>
-                <button onclick="triggerRetrain()" id="retrain-btn">🔄 Trigger Retraining</button>
-                <div id="retrain-status"></div>
+            </div>
+
+            <div class="status-card">
+                <div class="status-header">
+                    <div>
+                        <div class="status-label">Avg Confidence</div>
+                        <div class="status-value" id="avg-conf">0%</div>
+                    </div>
+                    <div class="status-icon">
+                        <i class="fas fa-target"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <div class="container">
+        <div id="predict">
+            <h2 class="section-title">
+                <i class="fas fa-microphone"></i>
+                Single Audio Prediction
+            </h2>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-file-audio"></i>
+                        Upload & Analyze
+                    </div>
+                    <div class="card-body">
+                        <p>Upload a bird audio recording to identify the species. Our deep learning model analyzes 95 acoustic features to provide accurate classification.</p>
+
+                        <div class="upload-zone" id="single-upload">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-zone-title">Upload Audio File</div>
+                            <div class="upload-zone-subtitle">Click or drag & drop MP3 or WAV files</div>
+                        </div>
+
+                        <input type="file" id="single-file" accept=".wav,.mp3">
+
+                        <button class="btn btn-primary" onclick="predictSingle()" id="predict-btn" disabled>
+                            <i class="fas fa-search"></i> Identify Species
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar"></i>
+                        Results & Confidence
+                    </div>
+                    <div class="card-body" id="result-container">
+                        <p style="color: var(--text-light); text-align: center; padding: 2rem 0;">
+                            <i class="fas fa-info-circle"></i> Upload an audio file to see prediction results
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="analytics" style="margin-top: 4rem;">
+            <h2 class="section-title">
+                <i class="fas fa-bar-chart"></i>
+                System Analytics
+            </h2>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-history"></i>
+                        Recent Predictions
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="confidence-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-layer-group"></i>
+                        Species Distribution
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="species-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="retrain" style="margin-top: 4rem;">
+            <h2 class="section-title">
+                <i class="fas fa-sync"></i>
+                Model Retraining
+            </h2>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-database"></i>
+                        Upload Training Data
+                    </div>
+                    <div class="card-body">
+                        <p>Upload multiple bird audio samples to improve model performance. The system will automatically preprocess and retrain the model with your data.</p>
+
+                        <div class="upload-zone" id="bulk-upload">
+                            <div class="upload-icon">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <div class="upload-zone-title">Upload Multiple Files</div>
+                            <div class="upload-zone-subtitle">Drag & drop multiple MP3/WAV files or click to select</div>
+                        </div>
+
+                        <input type="file" id="bulk-files" accept=".wav,.mp3" multiple>
+
+                        <div class="file-list" id="file-list"></div>
+
+                        <button class="btn btn-primary" onclick="startRetraining()" id="retrain-btn" disabled>
+                            <i class="fas fa-play"></i> Start Retraining
+                        </button>
+
+                        <div class="progress-container" id="progress-section" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill" style="width: 0%">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-cogs"></i>
+                        Training Logs
+                    </div>
+                    <div class="card-body">
+                        <div class="result-box" id="training-logs" style="min-height: 150px;">
+                            <p style="color: var(--text-light);">
+                                <i class="fas fa-info-circle"></i> Logs will appear here during retraining.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="about" style="margin-top: 4rem;">
+            <h2 class="section-title">
+                <i class="fas fa-info-circle"></i>
+                About This System
+            </h2>
+
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-brain"></i>
+                    System Overview
+                </div>
+                <div class="card-body">
+                    <p>
+                        The Avian Recognition System is machine learning pipeline designed at 
+                        the African Leadership University for intelligent classification of bird species through 
+                        acoustic analysis. It leverages deep neural networks, spectrogram feature extraction, 
+                        and automated preprocessing routines to offer a reliable identification experience.
+                    </p>
+                    <p>
+                        This platform supports single predictions, analytics dashboards, and full model retraining 
+                        with user-uploaded datasets — enabling continuous improvement of the classifier over time.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        © 2025 Avian Recognition System — Built for ALU Machine Learning Pipeline.
+    </footer>
+
     <script>
-        let singleFile = null;
+        const API_URL = 'http://localhost:5000/api';
+        let selectedFile = null;
         let bulkFiles = [];
-        let speciesChart = null;
         let confidenceChart = null;
+        let speciesChart = null;
 
-        function initCharts() {
-            const speciesCtx = document.getElementById('species-chart').getContext('2d');
-            speciesChart = new Chart(speciesCtx, {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Predictions',
-                        data: [],
-                        backgroundColor: 'rgba(99, 102, 241, 0.8)',
-                        borderColor: 'rgba(55, 48, 163, 1)',
-                        borderWidth: 2,
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { 
-                            beginAtZero: true,
-                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
-                    }
-                }
-            });
-
-            const confidenceCtx = document.getElementById('confidence-chart').getContext('2d');
-            confidenceChart = new Chart(confidenceCtx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Confidence',
-                        data: [],
-                        borderColor: 'rgba(99, 102, 241, 1)',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        tension: 0.4,
-                        borderWidth: 3,
-                        pointRadius: 4,
-                        pointBackgroundColor: 'rgba(99, 102, 241, 1)',
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            max: 1,
-                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
-                    }
-                }
-            });
-        }
-
-        ['single-upload', 'bulk-upload'].forEach(id => {
-            const element = document.getElementById(id);
-            element.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                element.classList.add('dragover');
-            });
-            element.addEventListener('dragleave', () => {
-                element.classList.remove('dragover');
-            });
-            element.addEventListener('drop', (e) => {
-                e.preventDefault();
-                element.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                if (id === 'single-upload' && files.length > 0) {
-                    handleSingleFile(files[0]);
-                } else if (id === 'bulk-upload') {
-                    handleBulkFiles(files);
-                }
-            });
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            loadMetrics();
+            setInterval(loadMetrics, 5000);
         });
 
-        function handleSingleFile(file) {
-            singleFile = file;
+        function setupEventListeners() {
+            // Single file upload
+            const singleUpload = document.getElementById('single-upload');
+            const singleFile = document.getElementById('single-file');
+        
+        singleUpload.addEventListener('click', () => singleFile.click());
+        singleFile.addEventListener('change', handleSingleFile);
+        
+        // Bulk file upload
+        const bulkUpload = document.getElementById('bulk-upload');
+        const bulkFilesInput = document.getElementById('bulk-files');
+        
+        bulkUpload.addEventListener('click', () => bulkFilesInput.click());
+        bulkFilesInput.addEventListener('change', handleBulkFiles);
+        
+        // Drag and drop for single
+        singleUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            singleUpload.classList.add('dragover');
+        });
+        
+        singleUpload.addEventListener('dragleave', () => {
+            singleUpload.classList.remove('dragover');
+        });
+        
+        singleUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            singleUpload.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                singleFile.files = e.dataTransfer.files;
+                handleSingleFile();
+            }
+        });
+        
+        // Drag and drop for bulk
+        bulkUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            bulkUpload.classList.add('dragover');
+        });
+        
+        bulkUpload.addEventListener('dragleave', () => {
+            bulkUpload.classList.remove('dragover');
+        });
+        
+        bulkUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            bulkUpload.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                bulkFilesInput.files = e.dataTransfer.files;
+                handleBulkFiles();
+            }
+        });
+    }
+
+    function handleSingleFile() {
+        const fileInput = document.getElementById('single-file');
+        if (fileInput.files.length > 0) {
+            selectedFile = fileInput.files[0];
             document.getElementById('predict-btn').disabled = false;
-            document.getElementById('single-upload').innerHTML = `
-                <span class="upload-icon">✅</span>
-                <p><strong>${file.name}</strong></p>
-                <p style="color: #10b981; font-weight: 600;">File ready for prediction</p>
+            
+            const uploadZone = document.getElementById('single-upload');
+            uploadZone.querySelector('.upload-zone-title').textContent = selectedFile.name;
+            uploadZone.querySelector('.upload-zone-subtitle').textContent = 'File ready for prediction';
+        }
+    }
+
+    function handleBulkFiles() {
+        const fileInput = document.getElementById('bulk-files');
+        bulkFiles = Array.from(fileInput.files);
+        
+        const fileList = document.getElementById('file-list');
+        fileList.innerHTML = '';
+        
+        bulkFiles.forEach((file, index) => {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <i class="fas fa-file-audio"></i>
+                <span>${file.name}</span>
+                <span style="margin-left: auto; color: var(--text-light);">${(file.size / 1024).toFixed(2)} KB</span>
             `;
-        }
+            fileList.appendChild(fileItem);
+        });
+        
+        document.getElementById('retrain-btn').disabled = bulkFiles.length === 0;
+        
+        const uploadZone = document.getElementById('bulk-upload');
+        uploadZone.querySelector('.upload-zone-title').textContent = `${bulkFiles.length} files selected`;
+    }
 
-        function handleBulkFiles(files) {
-            bulkFiles = Array.from(files);
-            document.getElementById('upload-btn').disabled = false;
-            const fileList = document.getElementById('file-list');
-            fileList.innerHTML = '';
-            bulkFiles.forEach(file => {
-                const div = document.createElement('div');
-                div.className = 'file-item';
-                div.textContent = `📄 ${file.name}`;
-                fileList.appendChild(div);
+    async function predictSingle() {
+        if (!selectedFile) {
+            alert('Please select a file first');
+            return;
+        }
+        
+        const predictBtn = document.getElementById('predict-btn');
+        const resultContainer = document.getElementById('result-container');
+        
+        predictBtn.disabled = true;
+        predictBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        
+        const formData = new FormData();
+        formData.append('audio', selectedFile);
+        
+        try {
+            const response = await fetch(`${API_URL}/predict`, {
+                method: 'POST',
+                body: formData
             });
+            
+            if (!response.ok) {
+                throw new Error('Prediction failed');
+            }
+            
+            const data = await response.json();
+            displayResults(data);
+            loadMetrics();
+            
+        } catch (error) {
+            console.error('Error:', error);
+            resultContainer.innerHTML = `
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div>Prediction failed. Please make sure the Flask server is running and try again.</div>
+                </div>
+            `;
+        } finally {
+            predictBtn.disabled = false;
+            predictBtn.innerHTML = '<i class="fas fa-search"></i> Identify Species';
         }
+    }
 
-        async function predictSingle() {
-            if (!singleFile) return;
-            
-            const formData = new FormData();
-            formData.append('audio', singleFile);
-            
-            document.getElementById('predict-btn').disabled = true;
-            document.getElementById('single-result').innerHTML = '<div class="alert alert-info">⏳ Processing audio file...</div>';
-            
-            try {
-                const response = await fetch('/api/predict', {
-                    method: 'POST',
-                    body: formData
-                });
+    function displayResults(data) {
+        const resultContainer = document.getElementById('result-container');
+        
+        const top5Entries = Object.entries(data.top_5_predictions);
+        const predictionsHTML = top5Entries.map(([species, confidence]) => `
+            <div class="prediction-item">
+                <span class="prediction-name">${species}</span>
+                <span class="prediction-confidence">${(confidence * 100).toFixed(2)}%</span>
+            </div>
+        `).join('');
+        
+        resultContainer.innerHTML = `
+            <div class="result-box">
+                <div class="result-title">Predicted Species</div>
+                <div class="result-species">${data.predicted_species}</div>
                 
+                <div class="confidence-display">
+                    Confidence: <span class="confidence-value">${data.confidence_percent}</span>
+                </div>
+                
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: ${data.confidence * 100}%"></div>
+                </div>
+                
+                <div class="result-title" style="margin-top: 2rem;">Top 5 Predictions</div>
+                <div class="predictions-list">
+                    ${predictionsHTML}
+                </div>
+            </div>
+        `;
+    }
+
+    async function startRetraining() {
+        if (bulkFiles.length === 0) {
+            alert('Please upload files first');
+            return;
+        }
+        
+        const retrainBtn = document.getElementById('retrain-btn');
+        const progressSection = document.getElementById('progress-section');
+        const progressFill = document.getElementById('progress-fill');
+        const trainingLogs = document.getElementById('training-logs');
+        
+        retrainBtn.disabled = true;
+        progressSection.style.display = 'block';
+        
+        trainingLogs.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Uploading files...</p>';
+        
+        const formData = new FormData();
+        bulkFiles.forEach(file => {
+            formData.append('files', file);
+        });
+        
+        try {
+            // Upload files
+            const uploadResponse = await fetch(`${API_URL}/upload_bulk`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!uploadResponse.ok) {
+                throw new Error('Upload failed');
+            }
+            
+            const uploadData = await uploadResponse.json();
+            trainingLogs.innerHTML = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <div>${uploadData.message}</div>
+                </div>
+            `;
+            
+            // Start retraining
+            trainingLogs.innerHTML += '<p><i class="fas fa-spinner fa-spin"></i> Starting retraining process...</p>';
+            
+            const retrainResponse = await fetch(`${API_URL}/trigger_retrain`, {
+                method: 'POST'
+            });
+            
+            if (!retrainResponse.ok) {
+                throw new Error('Retraining failed');
+            }
+            
+            // Monitor progress
+            monitorRetrainingProgress();
+            
+        } catch (error) {
+            console.error('Error:', error);
+            trainingLogs.innerHTML = `
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div>Error: ${error.message}. Make sure the Flask server is running.</div>
+                </div>
+            `;
+            retrainBtn.disabled = false;
+            progressSection.style.display = 'none';
+        }
+    }
+
+    async function monitorRetrainingProgress() {
+        const progressFill = document.getElementById('progress-fill');
+        const trainingLogs = document.getElementById('training-logs');
+        const retrainBtn = document.getElementById('retrain-btn');
+        
+        const interval = setInterval(async () => {
+            try {
+                const response = await fetch(`${API_URL}/retrain_status`);
                 const data = await response.json();
                 
-                if (response.ok) {
-                    let html = '<div class="result">';
-                    html += `<h3>🎯 Predicted Species: ${data.predicted_species}</h3>`;
-                    html += `<p>Confidence: <strong>${data.confidence_percent}</strong></p>`;
-                    html += '<div class="confidence-bar"><div class="confidence-fill" style="width: ' + (data.confidence * 100) + '%"></div></div>';
-                    html += '<h4>Top 5 Predictions:</h4>';
-                    
-                    for (const [species, conf] of Object.entries(data.top_5_predictions)) {
-                        html += `<div class="result-item">
-                            <span>${species}</span>
-                            <span>${(conf * 100).toFixed(2)}%</span>
-                        </div>`;
-                    }
-                    html += '</div>';
-                    
-                    document.getElementById('single-result').innerHTML = html;
-                    updateMetrics();
-                } else {
-                    document.getElementById('single-result').innerHTML = `<div class="alert alert-error">❌ ${data.error}</div>`;
-                }
-            } catch (error) {
-                document.getElementById('single-result').innerHTML = `<div class="alert alert-error">❌ Error: ${error.message}</div>`;
-            } finally {
-                document.getElementById('predict-btn').disabled = false;
-            }
-        }
-
-        async function uploadBulkFiles() {
-            if (bulkFiles.length === 0) return;
-            
-            const formData = new FormData();
-            bulkFiles.forEach(file => formData.append('files', file));
-            
-            document.getElementById('upload-btn').disabled = true;
-            
-            try {
-                const response = await fetch('/api/upload_bulk', {
-                    method: 'POST',
-                    body: formData
-                });
+                progressFill.style.width = `${data.progress}%`;
+                progressFill.textContent = `${data.progress}%`;
                 
-                const data = await response.json();
-                
-                if (response.ok) {
-                    alert(`✅ Successfully uploaded ${data.uploaded_count} files!`);
-                    bulkFiles = [];
-                    document.getElementById('file-list').innerHTML = '';
-                    document.getElementById('upload-btn').disabled = true;
-                } else {
-                    alert('❌ Upload failed: ' + data.error);
-                }
-            } catch (error) {
-                alert('❌ Error: ' + error.message);
-            }
-        }
-
-        async function triggerRetrain() {
-            if (!confirm('🔄 Start retraining the model? This may take several minutes.')) return;
-            
-            document.getElementById('retrain-btn').disabled = true;
-            
-            try {
-                const response = await fetch('/api/trigger_retrain', { method: 'POST' });
-                const data = await response.json();
-                
-                if (response.ok) {
-                    monitorRetraining();
-                } else {
-                    alert('❌ Retrain failed: ' + data.error);
-                    document.getElementById('retrain-btn').disabled = false;
-                }
-            } catch (error) {
-                alert('❌ Error: ' + error.message);
-                document.getElementById('retrain-btn').disabled = false;
-            }
-        }
-
-        async function monitorRetraining() {
-            const statusDiv = document.getElementById('retrain-status');
-            
-            const interval = setInterval(async () => {
-                try {
-                    const response = await fetch('/api/retrain_status');
-                    const data = await response.json();
-                    
-                    if (data.is_retraining) {
-                        statusDiv.innerHTML = `
-                            <div class="alert alert-info">
-                                <p><strong>🔄 Retraining in progress...</strong></p>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${data.progress}%">${data.progress}%</div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        clearInterval(interval);
-                        statusDiv.innerHTML = '<div class="alert alert-success">✅ Retraining completed successfully!</div>';
-                        document.getElementById('retrain-btn').disabled = false;
-                        updateMetrics();
-                    }
-                } catch (error) {
+                if (data.progress === 100) {
                     clearInterval(interval);
-                    statusDiv.innerHTML = '<div class="alert alert-error">❌ Monitoring error</div>';
-                    document.getElementById('retrain-btn').disabled = false;
+                    trainingLogs.innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            <div>Retraining completed successfully! Model version: ${data.model_version}</div>
+                        </div>
+                    `;
+                    retrainBtn.disabled = false;
+                    loadMetrics();
+                    
+                    setTimeout(() => {
+                        document.getElementById('progress-section').style.display = 'none';
+                    }, 3000);
+                } else if (data.progress === -1) {
+                    clearInterval(interval);
+                    trainingLogs.innerHTML = `
+                        <div class="alert alert-error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>Retraining failed. Check the server logs for details.</div>
+                        </div>
+                    `;
+                    retrainBtn.disabled = false;
                 }
-            }, 2000);
-        }
-
-        async function updateMetrics() {
-            try {
-                const [healthResponse, metricsResponse] = await Promise.all([
-                    fetch('/api/health'),
-                    fetch('/api/metrics')
-                ]);
-                
-                const health = await healthResponse.json();
-                const metrics = await metricsResponse.json();
-                
-                document.getElementById('uptime').textContent = formatUptime(health.uptime_seconds);
-                document.getElementById('model-version').textContent = health.model_version;
-                document.getElementById('total-predictions').textContent = metrics.total_predictions;
-                document.getElementById('avg-confidence').textContent = (metrics.avg_confidence * 100).toFixed(1) + '%';
-                
-                const species = Object.keys(metrics.species_distribution);
-                const counts = Object.values(metrics.species_distribution);
-                speciesChart.data.labels = species.slice(0, 10);
-                speciesChart.data.datasets[0].data = counts.slice(0, 10);
-                speciesChart.update();
-                
-                const recent = metrics.recent_predictions.slice(-20);
-                confidenceChart.data.labels = recent.map((_, i) => i + 1);
-                confidenceChart.data.datasets[0].data = recent.map(p => p.confidence);
-                confidenceChart.update();
-                
             } catch (error) {
-                console.error('Error updating metrics:', error);
+                console.error('Error monitoring progress:', error);
             }
-        }
+        }, 1000);
+    }
 
-        function formatUptime(seconds) {
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${hours}h ${minutes}m ${secs}s`;
+    async function loadMetrics() {
+        try {
+            const response = await fetch(`${API_URL}/metrics`);
+            const data = await response.json();
+            
+            document.getElementById('total-pred').textContent = data.total_predictions;
+            document.getElementById('avg-conf').textContent = `${(data.avg_confidence * 100).toFixed(1)}%`;
+            
+            updateCharts(data);
+        } catch (error) {
+            console.error('Error loading metrics:', error);
         }
+    }
 
-        initCharts();
-        updateMetrics();
-        setInterval(updateMetrics, 5000);
-    </script>
-</body>
-</html>
+    function updateCharts(data) {
+        // Confidence chart
+        const confCtx = document.getElementById('confidence-chart').getContext('2d');
+        
+        if (confidenceChart) {
+            confidenceChart.destroy();
+        }
+        
+        const recentPreds = data.recent_predictions.slice(-10);
+        
+        confidenceChart = new Chart(confCtx, {
+            type: 'line',
+            data: {
+                labels: recentPreds.map((_, i) => `#${i + 1}`),
+                datasets: [{
+                    label: 'Confidence',
+                    data: recentPreds.map(p => p.confidence * 100),
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: value => value + '%'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Species chart
+        const specCtx = document.getElementById('species-chart').getContext('2d');
+        
+        if (speciesChart) {
+            speciesChart.destroy();
+        }
+        
+        const speciesData = Object.entries(data.species_distribution)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 8);
+        
+        speciesChart = new Chart(specCtx, {
+            type: 'bar',
+            data: {
+                labels: speciesData.map(([species]) => species.length > 20 ? species.substring(0, 20) + '...' : species),
+                datasets: [{
+                    label: 'Predictions',
+                    data: speciesData.map(([_, count]) => count),
+                    backgroundColor: '#10b981'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+    // ADD THESE FUNCTIONS BEFORE THE CLOSING </script> TAG
+
+let mfccChart = null;
+let spectralChart = null;
+let zcrChart = null;
+
+async function loadFeatureAnalysis() {
+    try {
+        const response = await fetch(`${API_URL}/feature_analysis`);
+        const data = await response.json();
+        
+        if (data.error) {
+            document.getElementById('feature-content').innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>${data.error}</div>
+                </div>
+            `;
+            return;
+        }
+        
+        // Update MFCC Chart
+        const mfccCtx = document.getElementById('mfcc-chart').getContext('2d');
+        if (mfccChart) mfccChart.destroy();
+        
+        mfccChart = new Chart(mfccCtx, {
+            type: 'bar',
+            data: {
+                labels: data.mfcc_analysis.labels,
+                datasets: [{
+                    label: 'MFCC Mean Values',
+                    data: data.mfcc_analysis.values,
+                    backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                    borderColor: 'rgba(99, 102, 241, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: { display: true, text: 'MFCC Value' }
+                    }
+                }
+            }
+        });
+        
+        document.getElementById('mfcc-description').innerHTML = `
+            <p style="color: var(--text); font-weight: 600; margin-bottom: 0.5rem;">
+                ${data.mfcc_analysis.description}
+            </p>
+            <p style="color: var(--text-light); font-size: 0.9rem;">
+                ${data.mfcc_analysis.interpretation}
+            </p>
+        `;
+        
+        // Update Spectral Centroid Chart
+        const specCtx = document.getElementById('spectral-chart').getContext('2d');
+        if (spectralChart) spectralChart.destroy();
+        
+        spectralChart = new Chart(specCtx, {
+            type: 'line',
+            data: {
+                labels: data.spectral_centroid.labels,
+                datasets: [{
+                    label: 'Spectral Centroid (Hz)',
+                    data: data.spectral_centroid.values,
+                    borderColor: 'rgba(236, 72, 153, 1)',
+                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: { display: true, text: 'Frequency (Hz)' }
+                    }
+                }
+            }
+        });
+        
+        document.getElementById('spectral-description').innerHTML = `
+            <p style="color: var(--text); font-weight: 600; margin-bottom: 0.5rem;">
+                ${data.spectral_centroid.description}
+            </p>
+            <p style="color: var(--text-light); font-size: 0.9rem;">
+                ${data.spectral_centroid.interpretation}
+            </p>
+        `;
+        
+        // Update ZCR Chart
+        const zcrCtx = document.getElementById('zcr-chart').getContext('2d');
+        if (zcrChart) zcrChart.destroy();
+        
+        zcrChart = new Chart(zcrCtx, {
+            type: 'bar',
+            data: {
+                labels: data.zcr_analysis.labels,
+                datasets: [{
+                    label: 'Zero Crossing Rate',
+                    data: data.zcr_analysis.values,
+                    backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'ZCR Value' }
+                    }
+                }
+            }
+        });
+        
+        document.getElementById('zcr-description').innerHTML = `
+            <p style="color: var(--text); font-weight: 600; margin-bottom: 0.5rem;">
+                ${data.zcr_analysis.description}
+            </p>
+            <p style="color: var(--text-light); font-size: 0.9rem;">
+                ${data.zcr_analysis.interpretation}
+            </p>
+        `;
+        
+        document.getElementById('feature-content').innerHTML = `
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <div>Feature analysis loaded successfully! Analyzed ${data.summary.total_samples} audio samples.</div>
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error('Error loading features:', error);
+        document.getElementById('feature-content').innerHTML = `
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>Failed to load feature analysis. Make sure you have uploaded training data.</div>
+            </div>
+        `;
+    }
+}
+
+// Auto-load on page load
+document.addEventListener('DOMContentLoaded', function() {
+    setupEventListeners();
+    loadMetrics();
+    loadFeatureAnalysis(); // Auto-load feature analysis
+    setInterval(loadMetrics, 5000);
+});
+</script>
