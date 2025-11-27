@@ -1,4 +1,4 @@
-#  Bird Sound Classification System - ML Pipeline Project
+# 🐦 Bird Sound Classification System - ML Pipeline Project
 
 ## 📹 Video Demonstration
 
@@ -6,19 +6,20 @@
 
 **Live Deployment URL**: [INSERT YOUR DEPLOYED URL HERE]
 
-
+---
 
 ##  Project Description
 
-This is an end to end Machine Learning pipeline for **Bird Sound Classification** using Deep Neural Networks. The system processes audio files (WAV/MP3), extracts 95 acoustic features, and classifies bird species with high accuracy.
+This is an **end-to-end Machine Learning pipeline** for **Bird Sound Classification** using Deep Neural Networks. The system processes audio files (WAV/MP3), extracts 95 acoustic features, and classifies bird species with high accuracy.
 
-###  Key Features
+### ✨ Key Features
 
-1. **Single Prediction**: Upload individual audio files for instant species identification
-2. **Bulk Upload & Retraining**: Upload multiple audio files and trigger model retraining
-3. **Real time Metrics**: System health, uptime, prediction confidence trends
-4. **Data Visualizations**: Species distribution, confidence trends, prediction history
-5. **Scalable Architecture**: Horizontal scaling with Docker containers + NGINX load balancer
+1. **🎤 Single Prediction**: Upload individual audio files for instant species identification
+2. **📦 Bulk Upload & Retraining**: Upload multiple audio files and trigger model retraining
+3. **📊 Real-time Metrics**: System health, uptime, prediction confidence trends
+4. **📈 Data Visualizations**: Species distribution, confidence trends, prediction history
+5. **🚀 Scalable Architecture**: Horizontal scaling with Docker containers + NGINX load balancer
+6. **🌐 Web Interface**: Modern, responsive UI with dark theme and interactive charts
 
 ---
 
@@ -32,14 +33,37 @@ This is an end to end Machine Learning pipeline for **Bird Sound Classification*
 | **F1-Score**    | 66.85%   |
 | **Test Loss**   | 2.0806   |
 
-**Model Architecture**:
-- Input Layer: 95 features
-- Layer 1: 512 neurons (ReLU, Dropout 0.5, L2 regularization)
-- Layer 2: 256 neurons (ReLU, Dropout 0.4, L2 regularization)
-- Layer 3: 128 neurons (ReLU, Dropout 0.3, L2 regularization)
-- Output Layer: 64 classes (Softmax)
+### 🧠 Model Architecture
+
+- **Input Layer**: 95 acoustic features
+- **Layer 1**: 512 neurons (ReLU, Dropout 0.5, L2 regularization)
+- **Layer 2**: 256 neurons (ReLU, Dropout 0.4, L2 regularization)
+- **Layer 3**: 128 neurons (ReLU, Dropout 0.3, L2 regularization)
+- **Output Layer**: 64 classes (Softmax activation)
+
+### 🎵 Feature Engineering (95 Features)
+
+- **MFCC** (Mel-Frequency Cepstral Coefficients): 80 features (mean, std, max, min)
+- **Spectral Centroid**: 3 features (mean, std, max)
+- **Spectral Rolloff**: 2 features (mean, std)
+- **Zero Crossing Rate**: 2 features (mean, std)
+- **Chroma STFT**: 2 features (mean, std)
+- **Mel Spectrogram**: 3 features (mean, std, max)
+- **Spectral Bandwidth**: 2 features (mean, std)
+- **RMS Energy**: 1 feature (mean)
 
 ---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- **Docker** and **Docker Compose** installed
+- **Python 3.8+** (for local development)
+- **Audio files** in WAV or MP3 format
+
+###  Docker Deployment 
+```bash
 
 ### Prerequisites
 

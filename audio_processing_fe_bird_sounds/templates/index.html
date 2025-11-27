@@ -3,558 +3,396 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avian Classification System - ALU ML Pipeline</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Bird Sound Classification System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #1a1f3a;
-            --secondary: #0f766e;
-            --accent: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --light: #f8fafc;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --border: #e2e8f0;
-            --success: #059669;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-            color: var(--text);
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #3a70ef;
+            color: #e2e8f0;
             line-height: 1.6;
-            min-height: 100vh;
         }
 
-        nav {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1.25rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        /* Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 0;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         }
 
         .nav-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 0 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 1rem 2rem;
         }
 
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: white;
+        .nav-brand {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            text-decoration: none;
+            gap: 12px;
         }
 
-        .logo i {
-            color: var(--secondary);
+        .nav-brand h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-logo {
+            font-size: 2rem;
         }
 
         .nav-links {
             display: flex;
+            gap: 2rem;
             list-style: none;
-            gap: 2.5rem;
         }
 
         .nav-links a {
-            color: rgba(255, 255, 255, 0.8);
+            color: #cbd5e1;
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s;
-            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
         }
 
         .nav-links a:hover {
-            color: var(--accent);
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
         }
 
-        .hero {
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #164e63 100%);
-            color: white;
-            padding: 5rem 2rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+        .nav-links a.active {
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.15);
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .hero::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: -5%;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(6, 78, 59, 0.1) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .hero-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            background: rgba(16, 185, 129, 0.2);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 0.5rem 1.5rem;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            letter-spacing: -1px;
-        }
-
-        .hero-subtitle {
-            font-size: 1.35rem;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 2.5rem;
-            font-weight: 300;
-        }
-
-        .hero-meta {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-            padding-top: 3rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .meta-item {
-            text-align: center;
-        }
-
-        .meta-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: var(--accent);
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        .meta-label {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .status-section {
-            max-width: 1400px;
-            margin: -2rem auto 0;
-            padding: 0 2rem;
-            position: relative;
-            z-index: 10;
-        }
-
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .status-card {
-            background: white;
-            padding: 1.75rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border);
-            transition: all 0.3s;
-        }
-
-        .status-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-        }
-
-        .status-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .status-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--secondary), var(--accent));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-        }
-
-        .status-label {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-        }
-
-        .status-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 0.5rem 0;
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            background: var(--accent);
-            border-radius: 50%;
-            animation: pulse-dot 2s infinite;
-        }
-
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 3rem 2rem;
-        }
-
-        .section-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .section-title i {
-            color: var(--accent);
-            font-size: 1.8rem;
-        }
-
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border);
-            transition: all 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .card-header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 1.75rem;
-            font-size: 1.35rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .card-body {
+        /* Container */
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
             padding: 2rem;
         }
 
-        .card-body p {
-            color: var(--text-light);
-            margin-bottom: 1.5rem;
-            font-size: 0.95rem;
-        }
-
-        .upload-zone {
-            border: 2px dashed var(--border);
-            border-radius: 10px;
+        /* Header */
+        .header { 
+            text-align: center; 
+            margin-bottom: 3rem; 
             padding: 3rem 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: var(--light);
-            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
         }
 
-        .upload-zone:hover {
-            border-color: var(--secondary);
-            background: rgba(15, 118, 110, 0.05);
-            transform: scale(1.01);
-        }
-
-        .upload-zone.dragover {
-            border-color: var(--accent);
-            background: rgba(16, 185, 129, 0.1);
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
-        }
-
-        .upload-icon {
-            font-size: 3.5rem;
-            color: var(--secondary);
+        .header h1 { 
+            font-size: 3rem; 
             margin-bottom: 1rem;
-        }
-
-        .upload-zone-title {
-            font-size: 1.1rem;
+            color: #ffffff;
             font-weight: 700;
-            color: var(--text);
-            margin-bottom: 0.5rem;
         }
 
-        .upload-zone-subtitle {
-            color: var(--text-light);
-            font-size: 0.9rem;
+        .header p { 
+            font-size: 1.2rem; 
+            color: #cbd5e1;
+            font-weight: 400;
         }
 
-        input[type="file"] {
-            display: none;
+        /* Metrics Grid */
+        .metrics-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 1.5rem; 
+            margin-bottom: 3rem; 
         }
 
-        .btn {
-            display: inline-block;
-            padding: 0.95rem 1.75rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.95rem;
-            text-decoration: none;
-            text-align: center;
-            margin: 0.5rem 0.5rem 0.5rem 0;
-            letter-spacing: 0.5px;
+        .metric-card { 
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            padding: 2rem; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            border: 1px solid #475569;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--secondary), var(--accent));
-            color: white;
-            box-shadow: 0 4px 15px rgba(6, 78, 59, 0.3);
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(6, 78, 59, 0.4);
-        }
-
-        .btn-secondary {
-            background: var(--light);
-            color: var(--primary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--border);
-            border-color: var(--text-light);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .alert {
-            padding: 1.25rem 1.75rem;
-            border-radius: 8px;
-            margin: 1.5rem 0;
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            font-weight: 500;
-            border-left: 4px solid;
-        }
-
-        .alert i {
-            font-size: 1.2rem;
-            flex-shrink: 0;
-            margin-top: 0.2rem;
-        }
-
-        .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border-color: var(--accent);
-        }
-
-        .alert-error {
-            background: #fee2e2;
-            color: #7f1d1d;
-            border-color: var(--danger);
-        }
-
-        .alert-info {
-            background: #dbeafe;
-            color: #1e3a8a;
+        .metric-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.3);
             border-color: #3b82f6;
         }
 
-        .alert-warning {
-            background: #fef3c7;
-            color: #92400e;
-            border-color: var(--warning);
-        }
-
-        .result-box {
-            background: linear-gradient(135deg, var(--light), #ffffff);
-            padding: 2rem;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            margin-top: 1.5rem;
-        }
-
-        .result-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text);
+        .metric-card h3 { 
+            color: #94a3b8; 
+            font-size: 0.9rem; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
             margin-bottom: 1rem;
-        }
-
-        .result-species {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--secondary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 1rem 0;
-        }
-
-        .confidence-display {
-            font-size: 1.1rem;
-            color: var(--text);
-            margin: 1.5rem 0;
-        }
-
-        .confidence-value {
-            font-weight: 700;
-            color: var(--accent);
-            font-size: 1.4rem;
-        }
-
-        .confidence-bar {
-            width: 100%;
-            height: 20px;
-            background: var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 1rem 0 2rem 0;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .confidence-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--secondary), var(--accent));
-            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
-        }
-
-        .predictions-list {
-            display: grid;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-        }
-
-        .prediction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 1.25rem;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-
-        .prediction-item:hover {
-            border-color: var(--accent);
-            background: rgba(16, 185, 129, 0.05);
-        }
-
-        .prediction-name {
             font-weight: 600;
-            color: var(--text);
         }
 
-        .prediction-confidence {
+        .metric-card .value { 
+            font-size: 2.5rem; 
+            font-weight: 700; 
+            color: #3b82f6; 
+            margin-bottom: 0.5rem; 
+        }
+
+        .metric-card .label { 
+            color: #94a3b8; 
+            font-size: 0.9rem; 
+        }
+
+        .metric-card.status-healthy { 
+            border-left: 4px solid #10b981; 
+        }
+
+        .metric-card.status-healthy .value {
+            color: #10b981;
+        }
+
+        /* Section */
+        .section { 
+            background: #1e293b;
+            padding: 2.5rem; 
+            border-radius: 16px; 
+            margin-bottom: 2rem; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid #334155;
+        }
+
+        .section h2 { 
+            color: #3b82f6; 
+            margin-bottom: 1.5rem; 
+            font-size: 1.8rem;
             font-weight: 700;
-            color: var(--secondary);
-            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .chart-container {
+        .section > p {
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        /* Upload Area */
+        .upload-area { 
+            border: 3px dashed #475569; 
+            border-radius: 12px; 
+            padding: 3rem; 
+            text-align: center; 
+            background: #0f172a;
+            transition: all 0.3s ease; 
+            cursor: pointer; 
+        }
+
+        .upload-area:hover { 
+            background: #1e293b;
+            border-color: #3b82f6; 
+        }
+
+        .upload-area.dragover { 
+            background: #1e3a8a;
+            border-color: #60a5fa; 
+            transform: scale(1.02);
+        }
+
+        .upload-area h3 {
+            color: #e2e8f0;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-area p {
+            color: #94a3b8;
+        }
+
+        input[type="file"] { display: none; }
+
+        /* Buttons */
+        .btn { 
+            padding: 1rem 2rem; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 1rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin: 0.5rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary { 
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white; 
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6); 
+        }
+
+        .btn-secondary { 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white; 
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-secondary:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
+        }
+
+        .btn-danger { 
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white; 
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-danger:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+        }
+
+        .btn:disabled { 
+            background: #475569;
+            cursor: not-allowed; 
+            box-shadow: none;
+        }
+
+        /* Result Box */
+        .result-box { 
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+            border: 2px solid #10b981; 
+            border-radius: 12px; 
+            padding: 2rem; 
+            margin-top: 2rem; 
+            display: none; 
+        }
+
+        .result-box h3 { 
+            color: #6ee7b7; 
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .result-item { 
+            background: #1e293b;
+            padding: 1.5rem; 
+            margin: 1rem 0; 
+            border-radius: 10px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid #334155;
+        }
+
+        .confidence-bar { 
+            height: 12px; 
+            background: #334155;
+            border-radius: 6px; 
+            overflow: hidden; 
+            flex-grow: 1; 
+            margin-left: 1.5rem; 
+            max-width: 200px; 
+        }
+
+        .confidence-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, #10b981, #059669); 
+            transition: width 0.5s ease; 
+        }
+
+        /* Error Box */
+        .error-box { 
+            background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+            border: 2px solid #ef4444; 
+            border-radius: 12px; 
+            padding: 1.5rem; 
+            margin-top: 2rem; 
+            color: #fecaca; 
+            display: none; 
+        }
+
+        /* Progress Bar */
+        .progress-bar { 
+            width: 100%; 
+            height: 35px; 
+            background: #334155;
+            border-radius: 17px; 
+            overflow: hidden; 
+            margin-top: 2rem; 
+            display: none;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6); 
+            transition: width 0.3s ease; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* Chart Container */
+        .chart-container { 
+            margin-top: 2rem; 
+            height: 400px; 
             position: relative;
-            height: 350px;
-            margin-top: 1.5rem;
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid #334155;
         }
 
-        .file-list {
-            max-height: 250px;
+        /* Loading */
+        .loading { 
+            display: none; 
+            text-align: center; 
+            padding: 2rem; 
+        }
+
+        .spinner { 
+            border: 4px solid #334155;
+            border-top: 4px solid #3b82f6; 
+            border-radius: 50%; 
+            width: 60px; 
+            height: 60px; 
+            animation: spin 1s linear infinite; 
+            margin: 0 auto; 
+        }
+
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+
+        /* File List */
+        .file-list { 
+            margin-top: 1.5rem; 
+            max-height: 300px; 
             overflow-y: auto;
-            margin-top: 1.5rem;
-            padding-right: 0.5rem;
         }
 
         .file-list::-webkit-scrollbar {
@@ -562,966 +400,801 @@
         }
 
         .file-list::-webkit-scrollbar-track {
-            background: var(--light);
+            background: #1e293b;
             border-radius: 4px;
         }
 
         .file-list::-webkit-scrollbar-thumb {
-            background: var(--border);
+            background: #475569;
             border-radius: 4px;
         }
 
         .file-list::-webkit-scrollbar-thumb:hover {
-            background: var(--text-light);
+            background: #64748b;
         }
 
-        .file-item {
-            padding: 0.85rem 1rem;
-            background: var(--light);
-            margin-bottom: 0.5rem;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            font-size: 0.9rem;
-            color: var(--text);
-            transition: all 0.2s;
-            display: flex;
+        .file-item { 
+            background: #0f172a;
+            padding: 1rem; 
+            margin: 0.5rem 0; 
+            border-radius: 8px; 
+            display: flex; 
+            justify-content: space-between; 
             align-items: center;
-            gap: 0.75rem;
+            border: 1px solid #334155;
         }
 
-        .file-item:hover {
-            background: rgba(16, 185, 129, 0.05);
-            border-color: var(--accent);
-        }
-
-        .progress-container {
-            margin: 1.5rem 0;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 30px;
-            background: var(--border);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--secondary), var(--accent));
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
+        .file-item .remove-btn { 
+            background: #ef4444;
+            color: white; 
+            border: none; 
+            padding: 0.5rem 1rem; 
+            border-radius: 6px; 
+            cursor: pointer; 
             font-size: 0.85rem;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
-        .preview-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin-top: 1rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        .file-item .remove-btn:hover {
+            background: #dc2626;
+            transform: scale(1.05);
         }
 
-        footer {
-            background: var(--primary);
-            color: rgba(255, 255, 255, 0.7);
-            padding: 2rem;
+        /* Retrain Status */
+        .retrain-status { 
+            background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+            border: 2px solid #f59e0b; 
+            border-radius: 12px; 
+            padding: 2rem; 
+            margin-top: 2rem; 
+            display: none; 
+        }
+
+        .retrain-status h3 {
+            color: #fde68a;
+        }
+
+        /* Info Box */
+        .info-box { 
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            border-left: 4px solid #3b82f6; 
+            padding: 1.5rem; 
+            margin: 1.5rem 0; 
+            border-radius: 8px; 
+        }
+
+        .info-box h4 { 
+            color: #93c5fd; 
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .info-box p { 
+            color: #cbd5e1; 
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        .info-box code {
+            background: #0f172a;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: #60a5fa;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Visualization Grid */
+        .visualization-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
+            gap: 2rem; 
+            margin-top: 2rem; 
+        }
+
+        /* Footer */
+        .footer {
             text-align: center;
-            margin-top: 4rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.9rem;
+            padding: 2rem;
+            margin-top: 3rem;
+            color: #64748b;
+            border-top: 1px solid #334155;
         }
 
-        footer a {
-            color: var(--accent);
-            text-decoration: none;
+        .footer p {
+            margin-bottom: 0.5rem;
         }
 
-        footer a:hover {
-            text-decoration: underline;
-        }
-
+        /* Responsive */
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-
-            .card-grid {
-                grid-template-columns: 1fr;
-            }
-
             .nav-links {
-                gap: 1.5rem;
-                font-size: 0.85rem;
+                display: none;
             }
 
-            .status-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            .header h1 {
+                font-size: 2rem;
             }
 
-            .hero-meta {
+            .metrics-grid {
                 grid-template-columns: 1fr;
-                gap: 1rem;
             }
 
-            .upload-zone {
-                padding: 2rem 1rem;
+            .visualization-grid {
+                grid-template-columns: 1fr;
             }
 
-            .upload-icon {
-                font-size: 2.5rem;
+            .container {
+                padding: 1rem;
             }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
         }
     </style>
 </head>
 <body>
-    <nav>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
         <div class="nav-container">
-            <a href="#" class="logo">
-                <i class="fas fa-feather"></i>
-                Avian Recognition System
-            </a>
+            <div class="nav-brand">
+                <span class="nav-logo">🐦</span>
+                <h1>BirdSound App</h1>
+            </div>
             <ul class="nav-links">
-                <li><a href="#predict">Predict</a></li>
-                <li><a href="#analytics">Analytics</a></li>
-                <li><a href="#features">Features</a></li>
+                <li><a href="#predict" class="active">Predict</a></li>
+                <li><a href="#bulk-upload">Bulk Upload</a></li>
                 <li><a href="#retrain">Retrain</a></li>
-                <li><a href="#about">About</a></li>
+                <li><a href="#visualizations">Insights</a></li>
+                <li><a href="#performance">Performance</a></li>
             </ul>
         </div>
     </nav>
 
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-badge">
-                <i class="fas fa-certificate"></i> African Leadership University ML Pipeline
-            </div>
-            <h1> Bird Species Classification</h1>
-            <p class="hero-subtitle">Advanced audio analysis for automated avian identification</p>
-            
-            <div class="hero-meta">
-                <div class="meta-item">
-                    <span class="meta-value">64</span>
-                    <span class="meta-label">Species Supported</span>
-                </div>
-                <div class="meta-item">
-                    <span class="meta-value">45ms</span>
-                    <span class="meta-label">Avg Response Time</span>
-                </div>
-                <div class="meta-item">
-                    <span class="meta-value">1500+</span>
-                    <span class="meta-label">Training Samples</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div class="status-section">
-        <div class="status-grid">
-            <div class="status-card">
-                <div class="status-header">
-                    <div>
-                        <div class="status-label">System Status</div>
-                        <div class="status-value"><span class="status-indicator"></span> Active</div>
-                    </div>
-                    <div class="status-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="status-card">
-                <div class="status-header">
-                    <div>
-                        <div class="status-label">Model Version</div>
-                        <div class="status-value" id="model-version">v1.1</div>
-                    </div>
-                    <div class="status-icon">
-                        <i class="fas fa-cube"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="status-card">
-                <div class="status-header">
-                    <div>
-                        <div class="status-label">Total Predictions</div>
-                        <div class="status-value" id="total-pred">0</div>
-                    </div>
-                    <div class="status-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="status-card">
-                <div class="status-header">
-                    <div>
-                        <div class="status-label">Avg Confidence</div>
-                        <div class="status-value" id="avg-conf">0%</div>
-                    </div>
-                    <div class="status-icon">
-                        <i class="fas fa-target"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="container">
-        <div id="predict">
-            <h2 class="section-title">
-                <i class="fas fa-microphone"></i>
-                Single Prediction (Audio )
-            </h2>
+        <!-- Header -->
+        <div class="header">
+            <h1>🎵 Bird Sound Classification System</h1>
+            <p>MLOps Pipeline - Deep Learning Audio Classification</p>
+            <p style="font-size: 1rem; margin-top: 1rem; opacity: 0.9;">African Leadership University | Machine Learning Pipeline Project</p>
+        </div>
 
-            <div class="card-grid">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-file-upload"></i>
-                        Upload and Analyze
+        <!-- Metrics Dashboard -->
+        <div class="metrics-grid">
+            <div class="metric-card status-healthy">
+                <h3>System Status</h3>
+                <div class="value" id="status">🟢 Healthy</div>
+                <div class="label">Model is operational</div>
+            </div>
+            <div class="metric-card">
+                <h3>Model Uptime</h3>
+                <div class="value" id="uptime">0h 0m</div>
+                <div class="label">Time since deployment</div>
+            </div>
+            <div class="metric-card">
+                <h3>Total Predictions</h3>
+                <div class="value" id="total-predictions">0</div>
+                <div class="label">Predictions made</div>
+            </div>
+            <div class="metric-card">
+                <h3>Avg Confidence</h3>
+                <div class="value" id="avg-confidence">0%</div>
+                <div class="label">Model certainty</div>
+            </div>
+            <div class="metric-card">
+                <h3>Model Version</h3>
+                <div class="value" id="model-version">v1.0</div>
+                <div class="label">Current model</div>
+            </div>
+            <div class="metric-card">
+                <h3>Species Classes</h3>
+                <div class="value" id="num-classes">64</div>
+                <div class="label">Bird species</div>
+            </div>
+        </div>
+
+        <!-- Single Audio Prediction Section -->
+        <div class="section" id="predict">
+            <h2>🎤 Single Audio Prediction</h2>
+            <p>Upload a single bird sound file (WAV or MP3) to identify the species</p>
+            
+            <div class="upload-area" id="single-upload-area">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🎵</div>
+                <h3>Drop your audio file here or click to browse</h3>
+                <p style="margin-top: 1rem;">Supported formats: WAV, MP3 | Max 10MB</p>
+                <input type="file" id="single-audio-file" accept=".wav,.mp3">
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-primary" id="predict-btn" disabled>🔍 Predict Species</button>
+            </div>
+
+            <div class="loading" id="predict-loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 1rem; color: #3b82f6; font-weight: 600; font-size: 1.1rem;">Analyzing audio...</p>
+            </div>
+
+            <div class="result-box" id="result-box">
+                <h3>🎯 Prediction Results</h3>
+                <div style="background: #1e293b; padding: 2rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #334155;">
+                    <h4 style="color: #60a5fa; margin-bottom: 1rem; font-size: 1.1rem;">Predicted Species:</h4>
+                    <div style="font-size: 2rem; font-weight: 700; color: #10b981;" id="predicted-species">-</div>
+                    <div style="margin-top: 1rem;">
+                        <span style="color: #94a3b8;">Confidence:</span>
+                        <span style="font-weight: 700; color: #3b82f6; font-size: 1.5rem;" id="confidence-score">0%</span>
                     </div>
-                    <div class="card-body">
-                        <p>Upload a bird audio recording (MP3/WAV) to identify the species. My deep learning model analyzes acoustic features or visual patterns for accurate classification.</p>
+                </div>
+                <h4 style="color: #60a5fa; margin-bottom: 1rem; font-size: 1.1rem;">Top 5 Predictions:</h4>
+                <div id="top-predictions"></div>
+            </div>
 
-                        <div class="upload-zone" id="single-upload">
-                            <div class="upload-icon">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                            </div>
-                            <div class="upload-zone-title">Upload Audio  File</div>
-                            <div class="upload-zone-subtitle">Click or drag & drop MP3, WAV files</div>
-                        </div>
+            <div class="error-box" id="error-box"></div>
+        </div>
 
-                        <input type="file" id="single-file" accept=".wav,.mp3,.jpg,.jpeg,.png">
+        <!-- Bulk Upload Section -->
+        <div class="section" id="bulk-upload">
+            <h2>📦 Bulk Upload for Retraining</h2>
+            <p>Upload multiple audio files to retrain the model with new data</p>
+            
+            <div class="info-box">
+                <h4>📝 File Naming Convention</h4>
+                <p>Name your files as: <code>SpeciesName_identifier.wav</code><br>
+                Example: <code>Andean_Tinamou_001.wav</code>, <code>Chilean_Tinamou_002.mp3</code></p>
+            </div>
 
-                        <div id="image-preview-container"></div>
+            <div class="upload-area" id="bulk-upload-area">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">📁</div>
+                <h3>Drop multiple audio files here or click to browse</h3>
+                <p style="margin-top: 1rem;">Select multiple WAV/MP3 files | Minimum 10 files required</p>
+                <input type="file" id="bulk-audio-files" accept=".wav,.mp3" multiple>
+            </div>
 
-                        <button class="btn btn-primary" onclick="predictSingle()" id="predict-btn" disabled>
-                            <i class="fas fa-search"></i> Identify Species
-                        </button>
+            <div class="file-list" id="file-list"></div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-secondary" id="upload-bulk-btn" disabled>📤 Upload Files</button>
+                <button class="btn btn-danger" id="clear-files-btn" disabled>🗑️ Clear All</button>
+            </div>
+
+            <div class="loading" id="upload-loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 1rem; color: #3b82f6; font-weight: 600; font-size: 1.1rem;">Uploading files...</p>
+            </div>
+
+            <div class="progress-bar" id="upload-progress-bar">
+                <div class="progress-fill" id="upload-progress-fill">0%</div>
+            </div>
+
+            <div class="result-box" id="upload-result-box">
+                <h3>✅ Upload Complete</h3>
+                <p id="upload-message"></p>
+            </div>
+        </div>
+
+        <!-- Model Retraining Section -->
+        <div class="section" id="retrain">
+            <h2>🔄 Model Retraining</h2>
+            <p>Trigger model retraining with uploaded data</p>
+            
+            <div class="info-box">
+                <h4>ℹ️ Retraining Process</h4>
+                <p>• Requires minimum 10 audio files<br>
+                • Process takes 5-15 minutes depending on data size<br>
+                • Model will be automatically updated upon completion<br>
+                • Old model is backed up before retraining</p>
+            </div>
+
+            <div style="text-align: center; margin: 2rem 0;">
+                <button class="btn btn-primary" id="trigger-retrain-btn">🔄 Trigger Retraining</button>
+                <button class="btn btn-secondary" id="check-retrain-status-btn">📊 Check Status</button>
+            </div>
+
+            <div class="retrain-status" id="retrain-status">
+                <h3 style="margin-bottom: 1.5rem;">⚙️ Retraining in Progress...</h3>
+                <div class="progress-bar" style="display: block;">
+                    <div class="progress-fill" id="retrain-progress-fill">0%</div>
+                </div>
+                <p id="retrain-message" style="margin-top: 1.5rem; color: #fde68a;"></p>
+            </div>
+
+            <div class="result-box" id="retrain-result-box">
+                <h3>✅ Retraining Complete</h3>
+                <div id="retrain-results"></div>
+            </div>
+        </div>
+
+        <!-- Data Visualizations Section -->
+        <div class="section" id="visualizations">
+            <h2>📊 Data Visualizations & Insights</h2>
+            <p>Explore patterns and insights from the bird sound dataset</p>
+            
+            <div class="info-box">
+                <h4>🔍 Feature Analysis</h4>
+                <p>These visualizations show key acoustic features extracted from bird sounds. Understanding these patterns helps interpret model predictions and dataset characteristics.</p>
+            </div>
+
+            <div class="visualization-grid">
+                <div>
+                    <h3 style="color: #60a5fa; margin-bottom: 1.5rem; font-size: 1.3rem;">🎵 MFCC (Mel-Frequency Cepstral Coefficients)</h3>
+                    <div class="chart-container">
+                        <canvas id="mfcc-chart"></canvas>
+                    </div>
+                    <div class="info-box" style="margin-top: 1.5rem;">
+                        <p><strong>What it means:</strong> MFCC represents the spectral envelope of sound. Higher values indicate more complex frequency patterns in bird calls.</p>
+                        <p style="margin-top: 0.5rem;"><strong>Insight:</strong> Different species show distinct MFCC signatures, helping the model distinguish between calls.</p>
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-chart-bar"></i>
-                        Results and Confidence
+                <div>
+                    <h3 style="color: #60a5fa; margin-bottom: 1.5rem; font-size: 1.3rem;">🔊 Spectral Centroid</h3>
+                    <div class="chart-container">
+                        <canvas id="spectral-chart"></canvas>
                     </div>
-                    <div class="card-body" id="result-container">
-                        <p style="color: var(--text-light); text-align: center; padding: 2rem 0;">
-                            <i class="fas fa-info-circle"></i> Upload an audio  file to see prediction results
-                        </p>
+                    <div class="info-box" style="margin-top: 1.5rem;">
+                        <p><strong>What it means:</strong> Indicates the "brightness" of sound - where the center of the frequency spectrum lies.</p>
+                        <p style="margin-top: 0.5rem;"><strong>Insight:</strong> Higher values suggest brighter, higher-pitched calls. Useful for separating species with different vocal ranges.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="color: #60a5fa; margin-bottom: 1.5rem; font-size: 1.3rem;">📈 Zero Crossing Rate (ZCR)</h3>
+                    <div class="chart-container">
+                        <canvas id="zcr-chart"></canvas>
+                    </div>
+                    <div class="info-box" style="margin-top: 1.5rem;">
+                        <p><strong>What it means:</strong> Measures how often the audio signal changes from positive to negative. Reflects noisiness and texture.</p>
+                        <p style="margin-top: 0.5rem;"><strong>Insight:</strong> Higher ZCR indicates more complex, noisy calls. Lower values suggest pure tones or melodic sounds.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-primary" id="load-visualizations-btn">📊 Load Visualizations</button>
+            </div>
+        </div>
+
+        <!-- Model Performance Section -->
+        <div class="section" id="performance">
+            <h2>📈 Model Performance Metrics</h2>
+            <div class="visualization-grid">
+                <div>
+                    <h3 style="color: #60a5fa; margin-bottom: 1.5rem; font-size: 1.3rem;">Species Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="species-chart"></canvas>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="color: #60a5fa; margin-bottom: 1.5rem; font-size: 1.3rem;">Confidence Trend</h3>
+                    <div class="chart-container">
+                        <canvas id="confidence-chart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="analytics" style="margin-top: 4rem;">
-            <h2 class="section-title">
-                <i class="fas fa-bar-chart"></i>
-                System Analytics
-            </h2>
-
-            <div class="card-grid">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-history"></i>
-                        Recent Predictions
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="confidence-chart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-layer-group"></i>
-                        Species Distribution
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="species-chart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="features" style="margin-top: 4rem;">
-            <h2 class="section-title">
-                <i class="fas fa-project-diagram"></i>
-                Feature Visualizations
-            </h2>
-
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-info-circle"></i>
-                    Dataset Feature Analysis
-                </div>
-                <div class="card-body">
-                    <div id="feature-content">
-                        <p style="color: var(--text-light); text-align: center; padding: 1rem 0;">
-                            <i class="fas fa-spinner fa-spin"></i> Loading feature analysis...
-                        </p>
-                    </div>
-
-                    <div class="card-grid" style="margin-top: 2rem;">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-signal"></i>
-                                MFCC Analysis
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="mfcc-chart"></canvas>
-                                </div>
-                                <div id="mfcc-description" style="margin-top: 1rem; padding: 1rem; background: var(--light); border-radius: 8px;"></div>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-wave-square"></i>
-                                Spectral Centroid
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="spectral-chart"></canvas>
-                                </div>
-                                <div id="spectral-description" style="margin-top: 1rem; padding: 1rem; background: var(--light); border-radius: 8px;"></div>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-chart-area"></i>
-                                Zero Crossing Rate
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="zcr-chart"></canvas>
-                                </div>
-                                <div id="zcr-description" style="margin-top: 1rem; padding: 1rem; background: var(--light); border-radius: 8px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="retrain" style="margin-top: 4rem;">
-            <h2 class="section-title">
-                <i class="fas fa-sync"></i>
-                Model Retraining
-            </h2>
-
-            <div class="card-grid">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-database"></i>
-                        Upload Training Data
-                    </div>
-                    <div class="card-body">
-                        <p>Upload multiple bird audio samples  to improve model performance. The system will automatically preprocess and retrain the model with your data.</p>
-
-                        <div class="upload-zone" id="bulk-upload">
-                            <div class="upload-icon">
-                                <i class="fas fa-folder-open"></i>
-</div>
-<div class="upload-zone-title">Upload Multiple Files</div>
-<div class="upload-zone-subtitle">Drag & drop multiple MP3/WAV files or click to select</div>
-</div>
-<input type="file" id="bulk-files" accept=".wav,.mp3,.jpg,.jpeg,.png" multiple>
-
-                    <div class="file-list" id="file-list"></div>
-
-                    <button class="btn btn-primary" onclick="startRetraining()" id="retrain-btn" disabled>
-                        <i class="fas fa-play"></i> Start Retraining
-                    </button>
-
-                    <div class="progress-container" id="progress-section" style="display: none;">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progress-fill" style="width: 0%">0%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-cogs"></i>
-                    Training Logs
-                </div>
-                <div class="card-body">
-                    <div class="result-box" id="training-logs" style="min-height: 150px;">
-                        <p style="color: var(--text-light);">
-                            <i class="fas fa-info-circle"></i> Logs will appear here during retraining.
-                        </p>
-                    </div>
-                </div>
-            </div>
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; 2024 Bird Sound Classification System | African Leadership University</p>
+            <p>Powered by TensorFlow & Flask</p>
         </div>
     </div>
 
-    <div id="about" style="margin-top: 4rem;">
-        <h2 class="section-title">
-            <i class="fas fa-info-circle"></i>
-            About This System
-        </h2>
+    <script>
+        let selectedFile = null;
+        let bulkFiles = [];
+        let speciesChart = null;
+        let confidenceChart = null;
+        let mfccChart = null;
+        let spectralChart = null;
+        let zcrChart = null;
 
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-brain"></i>
-                System Overview
-            </div>
-            <div class="card-body">
-                <p>
-                    The Avian Recognition System is a machine learning pipeline designed at 
-                    the African Leadership University for classification of bird species through 
-                    acoustic and visual analysis. It leverages deep neural networks, spectrogram feature extraction, 
-                    and automated preprocessing routines to offer a reliable identification experience.
-                </p>
-                <p>
-                    This platform supports single predictions from both audio, analytics dashboards with feature visualizations, and full model retraining 
-                    with user uploaded datasets enabling continuous improvement of the classifier over time.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<footer>
-    © 2025 Avian Recognition System — Built for ALU Machine Learning Pipeline.
-</footer>
-
-<script>
-    const API_URL = 'http://localhost:5000/api';
-    let selectedFile = null;
-    let bulkFiles = [];
-    let confidenceChart = null;
-    let speciesChart = null;
-    let mfccChart = null;
-    let spectralChart = null;
-    let zcrChart = null;
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        setupEventListeners();
-        loadMetrics();
-        loadFeatureAnalysis();
-        setInterval(loadMetrics, 5000);
+        // Smooth scroll for navigation
+        document.querySelectorAll('.nav-links a').forEach(link => {
+link.addEventListener('click', function(e) {
+e.preventDefault();
+const targetId = this.getAttribute('href');
+const targetSection = document.querySelector(targetId);
+if (targetSection) {
+targetSection.scrollIntoView({ behavior: 'smooth' });
+// Update active link
+                document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            }
+        });
     });
 
-    function setupEventListeners() {
-        // Single file upload
-        const singleUpload = document.getElementById('single-upload');
-        const singleFile = document.getElementById('single-file');
-    
-        singleUpload.addEventListener('click', () => singleFile.click());
-        singleFile.addEventListener('change', handleSingleFile);
-    
-        // Bulk file upload
-        const bulkUpload = document.getElementById('bulk-upload');
-        const bulkFilesInput = document.getElementById('bulk-files');
-    
-        bulkUpload.addEventListener('click', () => bulkFilesInput.click());
-        bulkFilesInput.addEventListener('change', handleBulkFiles);
-    
-        // Drag and drop for single
-        singleUpload.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            singleUpload.classList.add('dragover');
-        });
-    
-        singleUpload.addEventListener('dragleave', () => {
-            singleUpload.classList.remove('dragover');
-        });
-    
-        singleUpload.addEventListener('drop', (e) => {
-            e.preventDefault();
-            singleUpload.classList.remove('dragover');
-            if (e.dataTransfer.files.length > 0) {
-                singleFile.files = e.dataTransfer.files;
-                handleSingleFile();
-            }
-        });
-    
-        // Drag and drop for bulk
-        bulkUpload.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            bulkUpload.classList.add('dragover');
-        });
-    
-        bulkUpload.addEventListener('dragleave', () => {
-            bulkUpload.classList.remove('dragover');
-        });
-    
-        bulkUpload.addEventListener('drop', (e) => {
-            e.preventDefault();
-            bulkUpload.classList.remove('dragover');
-            if (e.dataTransfer.files.length > 0) {
-                bulkFilesInput.files = e.dataTransfer.files;
-                handleBulkFiles();
-            }
-        });
+    function updateMetrics() {
+        fetch('/api/health')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('status').textContent = data.status === 'healthy' ? '🟢 Healthy' : '🔴 Unhealthy';
+                const hours = Math.floor(data.uptime_seconds / 3600);
+                const minutes = Math.floor((data.uptime_seconds % 3600) / 60);
+                document.getElementById('uptime').textContent = `${hours}h ${minutes}m`;
+                document.getElementById('model-version').textContent = data.model_version;
+            })
+            .catch(err => console.error('Error fetching health:', err));
+
+        fetch('/api/metrics')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('total-predictions').textContent = data.total_predictions;
+                document.getElementById('avg-confidence').textContent = (data.avg_confidence * 100).toFixed(1) + '%';
+            })
+            .catch(err => console.error('Error fetching metrics:', err));
+
+        fetch('/api/classes')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('num-classes').textContent = data.num_classes;
+            })
+            .catch(err => console.error('Error fetching classes:', err));
     }
 
-    function handleSingleFile() {
-        const fileInput = document.getElementById('single-file');
-        if (fileInput.files.length > 0) {
-            selectedFile = fileInput.files[0];
-            document.getElementById('predict-btn').disabled = false;
-            
-            const uploadZone = document.getElementById('single-upload');
-            uploadZone.querySelector('.upload-zone-title').textContent = selectedFile.name;
-            
-            // Check if it's an image file
-            if (selectedFile.type.startsWith('image/')) {
-                uploadZone.querySelector('.upload-zone-subtitle').textContent = 'Image ready for prediction';
-                showImagePreview(selectedFile);
-            } else {
-                uploadZone.querySelector('.upload-zone-subtitle').textContent = 'Audio file ready for prediction';
-                document.getElementById('image-preview-container').innerHTML = '';
-            }
+    const singleUploadArea = document.getElementById('single-upload-area');
+    const singleFileInput = document.getElementById('single-audio-file');
+    const predictBtn = document.getElementById('predict-btn');
+
+    singleUploadArea.addEventListener('click', () => singleFileInput.click());
+
+    singleUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        singleUploadArea.classList.add('dragover');
+    });
+
+    singleUploadArea.addEventListener('dragleave', () => {
+        singleUploadArea.classList.remove('dragover');
+    });
+
+    singleUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        singleUploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            singleFileInput.files = files;
+            handleSingleFileSelect();
+        }
+    });
+
+    singleFileInput.addEventListener('change', handleSingleFileSelect);
+
+    function handleSingleFileSelect() {
+        const file = singleFileInput.files[0];
+        if (file) {
+            selectedFile = file;
+            singleUploadArea.querySelector('h3').textContent = `Selected: ${file.name}`;
+            predictBtn.disabled = false;
         }
     }
 
-    function showImagePreview(file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('image-preview-container').innerHTML = `
-                <div style="text-align: center; margin-top: 1rem;">
-                    <img src="${e.target.result}" class="preview-image" alt="Preview" style="max-height: 300px;">
-                </div>
-            `;
-        };
-        reader.readAsDataURL(file);
+    predictBtn.addEventListener('click', async () => {
+        if (!selectedFile) return;
+
+        document.getElementById('predict-loading').style.display = 'block';
+        document.getElementById('result-box').style.display = 'none';
+        document.getElementById('error-box').style.display = 'none';
+
+        const formData = new FormData();
+        formData.append('audio', selectedFile);
+
+        try {
+            const response = await fetch('/api/predict', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                document.getElementById('predicted-species').textContent = data.predicted_species;
+                document.getElementById('confidence-score').textContent = data.confidence_percent;
+
+                const topPredictionsDiv = document.getElementById('top-predictions');
+                topPredictionsDiv.innerHTML = '';
+
+                for (const [species, confidence] of Object.entries(data.top_5_predictions)) {
+                    const item = document.createElement('div');
+                    item.className = 'result-item';
+                    item.innerHTML = `
+                        <span style="font-weight: 600; color: #e2e8f0;">${species}</span>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: ${confidence * 100}%"></div>
+                        </div>
+                        <span style="font-weight: 600; color: #3b82f6;">${(confidence * 100).toFixed(2)}%</span>
+                    `;
+                    topPredictionsDiv.appendChild(item);
+                }
+
+                document.getElementById('result-box').style.display = 'block';
+                updateMetrics();
+                updateCharts();
+            } else {
+                document.getElementById('error-box').textContent = data.error || 'Prediction failed';
+                document.getElementById('error-box').style.display = 'block';
+            }
+        } catch (error) {
+            document.getElementById('error-box').textContent = 'Network error: ' + error.message;
+            document.getElementById('error-box').style.display = 'block';
+        } finally {
+            document.getElementById('predict-loading').style.display = 'none';
+        }
+    });
+
+    const bulkUploadArea = document.getElementById('bulk-upload-area');
+    const bulkFileInput = document.getElementById('bulk-audio-files');
+    const fileListDiv = document.getElementById('file-list');
+    const uploadBulkBtn = document.getElementById('upload-bulk-btn');
+    const clearFilesBtn = document.getElementById('clear-files-btn');
+
+    bulkUploadArea.addEventListener('click', () => bulkFileInput.click());
+
+    bulkUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        bulkUploadArea.classList.add('dragover');
+    });
+
+    bulkUploadArea.addEventListener('dragleave', () => {
+        bulkUploadArea.classList.remove('dragover');
+    });
+
+    bulkUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        bulkUploadArea.classList.remove('dragover');
+        const files = Array.from(e.dataTransfer.files);
+        addBulkFiles(files);
+    });
+
+    bulkFileInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        addBulkFiles(files);
+    });
+
+    function addBulkFiles(files) {
+        bulkFiles = bulkFiles.concat(files);
+        updateFileList();
     }
 
-    function handleBulkFiles() {
-        const fileInput = document.getElementById('bulk-files');
-        bulkFiles = Array.from(fileInput.files);
-    
-        const fileList = document.getElementById('file-list');
-        fileList.innerHTML = '';
-    
+    function updateFileList() {
+        fileListDiv.innerHTML = '';
         bulkFiles.forEach((file, index) => {
             const fileItem = document.createElement('div');
             fileItem.className = 'file-item';
-            const icon = file.type.startsWith('image/') ? 'fa-file-image' : 'fa-file-audio';
             fileItem.innerHTML = `
-                <i class="fas ${icon}"></i>
-                <span>${file.name}</span>
-                <span style="margin-left: auto; color: var(--text-light);">${(file.size / 1024).toFixed(2)} KB</span>
+                <span style="color: #cbd5e1;">${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+                <button class="remove-btn" onclick="removeFile(${index})">Remove</button>
             `;
-            fileList.appendChild(fileItem);
+            fileListDiv.appendChild(fileItem);
         });
-    
-        document.getElementById('retrain-btn').disabled = bulkFiles.length === 0;
-    
-        const uploadZone = document.getElementById('bulk-upload');
-        uploadZone.querySelector('.upload-zone-title').textContent = `${bulkFiles.length} files selected`;
+
+        uploadBulkBtn.disabled = bulkFiles.length === 0;
+        clearFilesBtn.disabled = bulkFiles.length === 0;
     }
 
-    async function predictSingle() {
-        if (!selectedFile) {
-            alert('Please select a file first');
-            return;
-        }
-    
-        const predictBtn = document.getElementById('predict-btn');
-        const resultContainer = document.getElementById('result-container');
-    
-        predictBtn.disabled = true;
-        predictBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
-    
+    function removeFile(index) {
+        bulkFiles.splice(index, 1);
+        updateFileList();
+    }
+
+    clearFilesBtn.addEventListener('click', () => {
+        bulkFiles = [];
+        updateFileList();
+    });
+
+    uploadBulkBtn.addEventListener('click', async () => {
+        if (bulkFiles.length === 0) return;
+
+        document.getElementById('upload-loading').style.display = 'block';
+        document.getElementById('upload-progress-bar').style.display = 'block';
+        document.getElementById('upload-result-box').style.display = 'none';
+
         const formData = new FormData();
-        
-        // Determine if it's an image or audio file
-        if (selectedFile.type.startsWith('image/')) {
-            formData.append('image', selectedFile);
-        } else {
-            formData.append('audio', selectedFile);
-        }
-    
+        bulkFiles.forEach(file => formData.append('files', file));
+
         try {
-            const response = await fetch(`${API_URL}/predict`, {
+            const response = await fetch('/api/upload_bulk', {
                 method: 'POST',
                 body: formData
             });
-        
-            if (!response.ok) {
-                throw new Error('Prediction failed');
-            }
-        
+
             const data = await response.json();
-            displayResults(data);
-            loadMetrics();
-        
+
+            if (response.ok) {
+                document.getElementById('upload-message').textContent = data.message;
+                document.getElementById('upload-result-box').style.display = 'block';
+                bulkFiles = [];
+                updateFileList();
+            } else {
+                alert('Upload failed: ' + data.error);
+            }
         } catch (error) {
-            console.error('Error:', error);
-            resultContainer.innerHTML = `
-                <div class="alert alert-error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <div>Prediction failed. Please make sure the Flask server is running and try again.</div>
-                </div>
-            `;
+            alert('Network error: ' + error.message);
         } finally {
-            predictBtn.disabled = false;
-            predictBtn.innerHTML = '<i class="fas fa-search"></i> Identify Species';
+            document.getElementById('upload-loading').style.display = 'none';
+            document.getElementById('upload-progress-bar').style.display = 'none';
         }
-    }
+    });
 
-    function displayResults(data) {
-        const resultContainer = document.getElementById('result-container');
-    
-        const top5Entries = Object.entries(data.top_5_predictions);
-        const predictionsHTML = top5Entries.map(([species, confidence]) => `
-            <div class="prediction-item">
-                <span class="prediction-name">${species}</span>
-                <span class="prediction-confidence">${(confidence * 100).toFixed(2)}%</span>
-            </div>
-        `).join('');
-    
-        resultContainer.innerHTML = `
-            <div class="result-box">
-                <div class="result-title">Predicted Species</div>
-                <div class="result-species">${data.predicted_species}</div>
-            
-                <div class="confidence-display">
-                    Confidence: <span class="confidence-value">${data.confidence_percent}</span>
-                </div>
-            
-                <div class="confidence-bar">
-                    <div class="confidence-fill" style="width: ${data.confidence * 100}%"></div>
-                </div>
-            
-                <div class="result-title" style="margin-top: 2rem;">Top 5 Predictions</div>
-                <div class="predictions-list">
-                    ${predictionsHTML}
-                </div>
-            </div>
-        `;
-    }
+    document.getElementById('trigger-retrain-btn').addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to trigger retraining? This will take several minutes.')) return;
 
-    async function startRetraining() {
-        if (bulkFiles.length === 0) {
-            alert('Please upload files first');
-            return;
-        }
-    
-        const retrainBtn = document.getElementById('retrain-btn');
-        const progressSection = document.getElementById('progress-section');
-        const progressFill = document.getElementById('progress-fill');
-        const trainingLogs = document.getElementById('training-logs');
-    
-        retrainBtn.disabled = true;
-        progressSection.style.display = 'block';
-    
-        trainingLogs.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Uploading files...</p>';
-    
-        const formData = new FormData();
-        bulkFiles.forEach(file => {
-            formData.append('files', file);
-        });
-    
         try {
-            // Upload files
-            const uploadResponse = await fetch(`${API_URL}/upload_bulk`, {
-                method: 'POST',
-                body: formData
-            });
-        
-            if (!uploadResponse.ok) {
-                throw new Error('Upload failed');
-            }
-        
-            const uploadData = await uploadResponse.json();
-            trainingLogs.innerHTML = `
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i>
-                    <div>${uploadData.message}</div>
-                </div>
-            `;
-        
-            // Start retraining
-            trainingLogs.innerHTML += '<p><i class="fas fa-spinner fa-spin"></i> Starting retraining process...</p>';
-        
-            const retrainResponse = await fetch(`${API_URL}/trigger_retrain`, {
-                method: 'POST'
-            });
-        
-            if (!retrainResponse.ok) {
-                throw new Error('Retraining failed');
-            }
-        
-            // Monitor progress
-            monitorRetrainingProgress();
-        
-        } catch (error) {
-            console.error('Error:', error);
-            trainingLogs.innerHTML = `
-                <div class="alert alert-error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <div>Error: ${error.message}. Make sure the Flask server is running.</div>
-                </div>
-            `;
-            retrainBtn.disabled = false;
-            progressSection.style.display = 'none';
-        }
-    }
-
-    async function monitorRetrainingProgress() {
-        const progressFill = document.getElementById('progress-fill');
-        const trainingLogs = document.getElementById('training-logs');
-        const retrainBtn = document.getElementById('retrain-btn');
-    
-        const interval = setInterval(async () => {
-            try {
-                const response = await fetch(`${API_URL}/retrain_status`);
-                const data = await response.json();
-            
-                progressFill.style.width = `${data.progress}%`;
-                progressFill.textContent = `${data.progress}%`;
-            
-                if (data.progress === 100) {
-                    clearInterval(interval);
-                    trainingLogs.innerHTML = `
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle"></i>
-                            <div>Retraining completed successfully! Model version: ${data.model_version}</div>
-                        </div>
-                    `;
-                    retrainBtn.disabled = false;
-                    loadMetrics();
-                    loadFeatureAnalysis();
-                
-                    setTimeout(() => {
-                        document.getElementById('progress-section').style.display = 'none';
-                    }, 3000);
-                } else if (data.progress === -1) {
-                    clearInterval(interval);
-                    trainingLogs.innerHTML = `
-                        <div class="alert alert-error">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <div>Retraining failed. Check the server logs for details.</div>
-                        </div>
-                    `;
-                    retrainBtn.disabled = false;
-                }
-            } catch (error) {
-                console.error('Error monitoring progress:', error);
-            }
-        }, 1000);
-    }
-
-    async function loadMetrics() {
-        try {
-            const response = await fetch(`${API_URL}/metrics`);
+            const response = await fetch('/api/trigger_retrain', { method: 'POST' });
             const data = await response.json();
-        
-            document.getElementById('total-pred').textContent = data.total_predictions;
-            document.getElementById('avg-conf').textContent = `${(data.avg_confidence * 100).toFixed(1)}%`;
-        
-            updateCharts(data);
+
+            if (response.ok) {
+                document.getElementById('retrain-status').style.display = 'block';
+                document.getElementById('retrain-message').textContent = data.message;
+                monitorRetraining();
+            } else {
+                alert('Retraining failed: ' + data.error);
+            }
         } catch (error) {
-            console.error('Error loading metrics:', error);
+            alert('Network error: ' + error.message);
         }
-    }
+    });
 
-    function updateCharts(data) {
-        // Confidence chart
-        const confCtx = document.getElementById('confidence-chart').getContext('2d');
-    
-        if (confidenceChart) {
-            confidenceChart.destroy();
-        }
-    
-        const recentPreds = data.recent_predictions.slice(-10);
-    
-        confidenceChart = new Chart(confCtx, {
-            type: 'line',
-            data: {
-                labels: recentPreds.map((_, i) => `#${i + 1}`),
-                datasets: [{
-                    label: 'Confidence',
-                    data: recentPreds.map(p => p.confidence * 100),
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            callback: value => value + '%'
-                        }
-                    }
-                }
-            }
-        });
-    
-        // Species chart
-        const specCtx = document.getElementById('species-chart').getContext('2d');
-    
-        if (speciesChart) {
-            speciesChart.destroy();
-        }
-    
-        const speciesData = Object.entries(data.species_distribution)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 8);
-    
-        speciesChart = new Chart(specCtx, {
-            type: 'bar',
-            data: {
-                labels: speciesData.map(([species]) => species.length > 20 ? species.substring(0, 20) + '...' : species),
-                datasets: [{
-                    label: 'Predictions',
-                    data: speciesData.map(([_, count]) => count),
-                    backgroundColor: '#10b981'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
-            }
-        });
-    }
+    document.getElementById('check-retrain-status-btn').addEventListener('click', checkRetrainStatus);
 
-    async function loadFeatureAnalysis() {
+    async function checkRetrainStatus() {
         try {
-            const response = await fetch(`${API_URL}/feature_analysis`);
+            const response = await fetch('/api/retrain_status');
             const data = await response.json();
-        
-            if (data.error) {
-                document.getElementById('feature-content').innerHTML = `
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <div>${data.error}</div>
-                    </div>
+
+            if (data.is_retraining) {
+                document.getElementById('retrain-status').style.display = 'block';
+                document.getElementById('retrain-progress-fill').style.width = data.progress + '%';
+                document.getElementById('retrain-progress-fill').textContent = data.progress + '%';
+            } else if (data.progress === 100) {
+                document.getElementById('retrain-status').style.display = 'none';
+                document.getElementById('retrain-result-box').style.display = 'block';
+                const resultsDiv = document.getElementById('retrain-results');
+                resultsDiv.innerHTML = `
+                    <p style="color: #cbd5e1;"><strong>Model Version:</strong> ${data.model_version}</p>
+                    <p style="color: #cbd5e1;"><strong>Last Retrain:</strong> ${new Date(data.last_retrain).toLocaleString()}</p>
                 `;
+                updateMetrics();
+            } else {
+                alert('No retraining in progress');
+            }
+        } catch (error) {
+            console.error('Error checking retrain status:', error);
+        }
+    }
+
+    function monitorRetraining() {
+        const interval = setInterval(async () => {
+            const response = await fetch('/api/retrain_status');
+            const data = await response.json();
+
+            if (data.is_retraining) {
+                document.getElementById('retrain-progress-fill').style.width = data.progress + '%';
+                document.getElementById('retrain-progress-fill').textContent = data.progress + '%';
+            } else {
+                clearInterval(interval);
+                if (data.progress === 100) {
+                    document.getElementById('retrain-status').style.display = 'none';
+                    document.getElementById('retrain-result-box').style.display = 'block';
+                    document.getElementById('retrain-results').innerHTML = `
+                        <p style="color: #cbd5e1;"><strong>✅ Retraining successful!</strong></p>
+                        <p style="color: #cbd5e1;"><strong>Model Version:</strong> ${data.model_version}</p>
+                        <p style="color: #cbd5e1;"><strong>Completed:</strong> ${new Date(data.last_retrain).toLocaleString()}</p>
+                    `;
+                    updateMetrics();
+                } else {
+                    document.getElementById('retrain-message').textContent = 'Retraining failed. Check server logs.';
+                }
+            }
+        }, 3000);
+    }
+
+    document.getElementById('load-visualizations-btn').addEventListener('click', loadFeatureVisualizations);
+
+    async function loadFeatureVisualizations() {
+        try {
+            const response = await fetch('/api/feature_analysis');
+            const data = await response.json();
+
+            if (data.error) {
+                alert(data.error);
                 return;
             }
-        
-            // Update MFCC Chart
-            const mfccCtx = document.getElementById('mfcc-chart').getContext('2d');
+
             if (mfccChart) mfccChart.destroy();
-        
+            if (spectralChart) spectralChart.destroy();
+            if (zcrChart) zcrChart.destroy();
+
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        display: true,
+                        labels: {
+                            color: '#cbd5e1'
+                        }
+                    },
+                    title: {
+                        display: true,
+                        color: '#94a3b8',
+                        font: {
+                            size: 14
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#94a3b8'
+                        },
+                        grid: {
+                            color: '#334155'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: '#94a3b8'
+                        },
+                        grid: {
+                            color: '#334155'
+                        }
+                    }
+                }
+            };
+
+            const mfccCtx = document.getElementById('mfcc-chart').getContext('2d');
             mfccChart = new Chart(mfccCtx, {
                 type: 'bar',
                 data: {
                     labels: data.mfcc_analysis.labels,
                     datasets: [{
-                        label: 'MFCC Mean Values',
+                        label: 'MFCC Mean',
                         data: data.mfcc_analysis.values,
-                        backgroundColor: 'rgba(99, 102, 241, 0.7)',
-                        borderColor: 'rgba(99, 102, 241, 1)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
                         borderWidth: 2
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    ...chartOptions,
                     plugins: {
-                        legend: { display: true }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            title: { display: true, text: 'MFCC Value' }
+                        ...chartOptions.plugins,
+                        title: {
+                            ...chartOptions.plugins.title,
+                            text: data.mfcc_analysis.interpretation
                         }
                     }
                 }
             });
-        
-            document.getElementById('mfcc-description').innerHTML = `
-                <p style="color: var(--text); font-weight: 600; margin-bottom: 0.5rem;">
-                    ${data.mfcc_analysis.description}
-                </p>
-                <p style="color: var(--text-light); font-size: 0.9rem;">
-                    ${data.mfcc_analysis.interpretation}
-                </p>
-            `;
-        
-            // Update Spectral Centroid Chart
-            const specCtx = document.getElementById('spectral-chart').getContext('2d');
-            if (spectralChart) spectralChart.destroy();
-        
-            spectralChart = new Chart(specCtx, {
+
+            const spectralCtx = document.getElementById('spectral-chart').getContext('2d');
+            spectralChart = new Chart(spectralCtx, {
                 type: 'line',
                 data: {
                     labels: data.spectral_centroid.labels,
                     datasets: [{
                         label: 'Spectral Centroid (Hz)',
                         data: data.spectral_centroid.values,
-                        borderColor: 'rgba(236, 72, 153, 1)',
-                        backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4,
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        borderWidth: 2,
                         fill: true
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    ...chartOptions,
                     plugins: {
-                        legend: { display: true }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            title: { display: true, text: 'Frequency (Hz)' }
+                        ...chartOptions.plugins,
+                        title: {
+                            ...chartOptions.plugins.title,
+                            text: data.spectral_centroid.interpretation
                         }
                     }
                 }
             });
-        
-            document.getElementById('spectral-description').innerHTML = `
-                <p style="color: var(--text); font-weight: 600; margin-bottom: 0.5rem;">
-                    ${data.spectral_centroid.description}
-                </p>
-                <p style="color: var(--text-light); font-size: 0.9rem;">
-                    ${data.spectral_centroid.interpretation}
-                </p>
-            `;
-        
-            // Update ZCR Chart
+
             const zcrCtx = document.getElementById('zcr-chart').getContext('2d');
-            if (zcrChart) zcrChart.destroy();
-        
             zcrChart = new Chart(zcrCtx, {
                 type: 'bar',
                 data: {
@@ -1529,8 +1202,48 @@
                     datasets: [{
                         label: 'Zero Crossing Rate',
                         data: data.zcr_analysis.values,
-                        backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                        borderColor: 'rgba(16, 185, 129, 1)',
+                        backgroundColor: 'rgba(139, 92, 246, 0.6)',
+                        borderColor: 'rgba(139, 92, 246, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    ...chartOptions,
+                    plugins: {
+                        ...chartOptions.plugins,
+                        title: {
+                            ...chartOptions.plugins.title,
+                            text: data.zcr_analysis.interpretation
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            alert('Failed to load visualizations: ' + error.message);
+        }
+    }
+
+    async function updateCharts() {
+        try {
+            const metricsRes = await fetch('/api/metrics');
+            const metricsData = await metricsRes.json();
+
+            const speciesData = metricsData.species_distribution || {};
+            const speciesLabels = Object.keys(speciesData).slice(0, 10);
+            const speciesCounts = Object.values(speciesData).slice(0, 10);
+
+            if (speciesChart) speciesChart.destroy();
+
+            const speciesCtx = document.getElementById('species-chart').getContext('2d');
+            speciesChart = new Chart(speciesCtx, {
+                type: 'bar',
+                data: {
+                    labels: speciesLabels,
+                    datasets: [{
+                        label: 'Prediction Count',
+                        data: speciesCounts,
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
                         borderWidth: 2
                     }]
                 },
@@ -1538,41 +1251,89 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: true }
+                        legend: { 
+                            display: false 
+                        }
                     },
                     scales: {
+                        x: {
+                            ticks: {
+                                color: '#94a3b8'
+                            },
+                            grid: {
+                                color: '#334155'
+                            }
+                        },
                         y: {
-                            beginAtZero: true,
-                            title: { display: true, text: 'ZCR Value' }
+                            ticks: {
+                                color: '#94a3b8'
+                            },
+                            grid: {
+                                color: '#334155'
+                            }
                         }
                     }
                 }
             });
-        
-            document.getElementById('zcr-description').innerHTML = `
-                <p style="color: var(--text); font-weight: 600; margin-bottom: 0.5rem;">
-                    ${data.zcr_analysis.description}
-                </p>
-                <p style="color: var(--text-light); font-size: 0.9rem;">
-                    ${data.zcr_analysis.interpretation}
-                </p>
-            `;
-        
-            document.getElementById('feature-content').innerHTML = `
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i>
-                    <div>Feature analysis loaded successfully! Analyzed ${data.summary.total_samples} audio samples.</div>
-                </div>
-            `;
-        
+
+            const recentPredictions = metricsData.recent_predictions || [];
+            const confidenceLabels = recentPredictions.map((p, i) => `#${i + 1}`);
+            const confidenceValues = recentPredictions.map(p => p.confidence * 100);
+
+            if (confidenceChart) confidenceChart.destroy();
+
+            const confidenceCtx = document.getElementById('confidence-chart').getContext('2d');
+            confidenceChart = new Chart(confidenceCtx, {
+                type: 'line',
+                data: {
+                    labels: confidenceLabels,
+                    datasets: [{
+                        label: 'Confidence %',
+                        data: confidenceValues,
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        borderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#94a3b8'
+                            },
+                            grid: {
+                                color: '#334155'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                color: '#94a3b8'
+                            },
+                            grid: {
+                                color: '#334155'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#cbd5e1'
+                            }
+                        }
+                    }
+                }
+            });
         } catch (error) {
-            console.error('Error loading features:', error);
-            document.getElementById('feature-content').innerHTML = `
-                <div class="alert alert-error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <div>Failed to load feature analysis. Make sure you have uploaded training data.</div>
-                </div>
-            `;
+            console.error('Error updating charts:', error);
         }
     }
+
+    updateMetrics();
+    setInterval(updateMetrics, 10000);
+    updateCharts();
 </script>
