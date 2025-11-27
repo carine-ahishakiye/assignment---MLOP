@@ -2,7 +2,7 @@
 
 ##  Video Demonstration
 
-**YouTube Demo Link**: [INSERT YOUR VIDEO LINK HERE]
+**YouTube Demo Link**: https://youtu.be/78U1ujGd_S0?si=SEQPC8su63037jtN
 
 **Live Deployment URL**: https://assignment---mlop-8npooe4tivumqtbxpimrh3.streamlit.app/
 
@@ -121,7 +121,7 @@ audio_processing_fe_bird_sounds/
 ├── requirements.txt                  
 ├── Dockerfile                         
 ├── docker-compose.yml                
-├── nginx.conf                         
+|                        
 │
 ├── notebook/
 │   └── bird_sound_classification.ipynb  
@@ -204,7 +204,7 @@ curl -X POST "http://localhost:5000/api/predict" \
 ### How It Works
 
 1. **Upload Audio Files**: Use the "Bulk Upload" section to upload multiple WAV/MP3 files
-2. **Trigger Retraining**: Click "🔄 Trigger Retraining" button
+2. **Trigger Retraining**: Click " Trigger Retraining" button
 3. **Monitor Progress**: Real-time progress bar shows training status
 4. **Automatic Model Update**: New model replaces the old one upon completion
 

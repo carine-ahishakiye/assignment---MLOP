@@ -4,7 +4,7 @@ import librosa
 import pickle
 from tensorflow.keras.models import load_model
 from datetime import datetime
-from pydub import AudioSegment  # For mp3 → wav conversion
+from pydub import AudioSegment  
 
 
 class BirdSoundPredictor:
