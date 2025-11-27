@@ -1,29 +1,29 @@
-# 🐦 Bird Sound Classification System - ML Pipeline Project
+#  Bird Sound Classification System - ML Pipeline Project
 
-## 📹 Video Demonstration
+##  Video Demonstration
 
 **YouTube Demo Link**: [INSERT YOUR VIDEO LINK HERE]
 
-**Live Deployment URL**: [INSERT YOUR DEPLOYED URL HERE]
+**Live Deployment URL**: https://assignment---mlop-8npooe4tivumqtbxpimrh3.streamlit.app/
 
 ---
 
 ##  Project Description
 
-This is an **end-to-end Machine Learning pipeline** for **Bird Sound Classification** using Deep Neural Networks. The system processes audio files (WAV/MP3), extracts 95 acoustic features, and classifies bird species with high accuracy.
+This is an **end to end Machine Learning pipeline** for **Bird Sound Classification** using Deep Neural Networks. The system processes audio files (WAV/MP3), extracts 95 acoustic features, and classifies bird species with high accuracy.
 
 ### ✨ Key Features
 
 1. **🎤 Single Prediction**: Upload individual audio files for instant species identification
-2. **📦 Bulk Upload & Retraining**: Upload multiple audio files and trigger model retraining
-3. **📊 Real-time Metrics**: System health, uptime, prediction confidence trends
-4. **📈 Data Visualizations**: Species distribution, confidence trends, prediction history
-5. **🚀 Scalable Architecture**: Horizontal scaling with Docker containers + NGINX load balancer
-6. **🌐 Web Interface**: Modern, responsive UI with dark theme and interactive charts
+2. ** Bulk Upload & Retraining**: Upload multiple audio files and trigger model retraining
+3. ** Real-time Metrics**: System health, uptime, prediction confidence trends
+4. ** Data Visualizations**: Species distribution, confidence trends, prediction history
+5. **Scalable Architecture**: Horizontal scaling with Docker containers + NGINX load balancer
+6. ** Web Interface**: Modern, responsive UI with dark theme and interactive charts
 
 ---
 
-## 📊 Model Performance
+##  Model Performance
 
 | Metric          | Score    |
 |-----------------|----------|
@@ -33,7 +33,7 @@ This is an **end-to-end Machine Learning pipeline** for **Bird Sound Classificat
 | **F1-Score**    | 66.85%   |
 | **Test Loss**   | 2.0806   |
 
-### 🧠 Model Architecture
+###  Model Architecture
 
 - **Input Layer**: 95 acoustic features
 - **Layer 1**: 512 neurons (ReLU, Dropout 0.5, L2 regularization)
@@ -41,7 +41,7 @@ This is an **end-to-end Machine Learning pipeline** for **Bird Sound Classificat
 - **Layer 3**: 128 neurons (ReLU, Dropout 0.3, L2 regularization)
 - **Output Layer**: 64 classes (Softmax activation)
 
-### 🎵 Feature Engineering (95 Features)
+###  Feature Engineering (95 Features)
 
 - **MFCC** (Mel-Frequency Cepstral Coefficients): 80 features (mean, std, max, min)
 - **Spectral Centroid**: 3 features (mean, std, max)
@@ -54,7 +54,7 @@ This is an **end-to-end Machine Learning pipeline** for **Bird Sound Classificat
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 
