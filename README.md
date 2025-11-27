@@ -346,20 +346,19 @@ ports:
 **Assignment**: MLOps Summative -  ML System
 
 **Learning Outcomes Demonstrated**:
-1. ✅ Data acquisition and preprocessing (audio feature engineering)
-2. ✅ Model creation and optimization (deep neural network)
-3. ✅ Model evaluation (4+ metrics: accuracy, precision, recall, F1)
-4. ✅ Model retraining pipeline (with trigger mechanism)
-5. ✅ API development (FastAPI with 8 endpoints)
-6. ✅ UI creation (real-time metrics, visualizations, upload)
-7. ✅ Cloud deployment (Dockerized, scalable architecture)
-8. ✅ Load testing (Locust with 1/2/4 container scenarios)
+1.  Data acquisition and preprocessing (audio feature engineering)
+2.  Model creation and optimization (deep neural network)
+3.  Model evaluation (4+ metrics: accuracy, precision, recall, F1)
+4.  Model retraining pipeline (with trigger mechanism)
+5.  API development (FastAPI with 8 endpoints)
+6.  UI creation (real-time metrics, visualizations, upload)
+7.  Cloud deployment (Dockerized, scalable architecture)
+8.  Load testing (Locust with 1/2/4 container scenarios)
 
 ---
 
-## 👨 Author
+##  Author
 
-**[Your Name]**  
 - GitHub: [carine-ahishakiye](https://github.com/carine-ahishakiye)
 - Email: c.yibukabay@alustudent.com
 
