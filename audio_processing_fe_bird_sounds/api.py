@@ -12,25 +12,29 @@ from functools import wraps
 from werkzeug.utils import secure_filename
 import threading
 import time
+import psutil
 
-# Flask App 
+# Flask App Configuration
 app = Flask(__name__)
 CORS(app)
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'
 RETRAIN_FOLDER = 'retrain_data'
-MODEL_PATH = r'C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\models\final_model.h5'
-SCALER_PATH = r'C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\models\scaler.pkl'
-ENCODER_PATH = r'C:\Users\PC\Desktop\assignment---MLOP\audio_processing_fe_bird_sounds\models\label_encoder.pkl'
+MODEL_PATH = r'C:\Users\PC\Documents\assignment-mlop\audio_processing_fe_bird_sounds\models\final_model.h5'
+SCALER_PATH = r'C:\Users\PC\Documents\assignment-mlop\audio_processing_fe_bird_sounds\models\scaler.pkl'
+ENCODER_PATH = r'C:\Users\PC\Documents\assignment-mlop\audio_processing_fe_bird_sounds\models\label_encoder.pkl'
 ALLOWED_EXTENSIONS = {'wav', 'mp3'}
 
-# Creating necessary directories
+# Create necessary directories
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RETRAIN_FOLDER, exist_ok=True)
 
-# Global State 
+#  APPLICATION STATE
+
+
 class AppState:
+    """Global application state management"""
     def __init__(self):
         self.model = None
         self.scaler = None
@@ -74,8 +78,11 @@ class AppState:
 
 state = AppState()
 
-# Load Model and Preprocessors 
+#  MODEL LOADING
+
+
 def load_model_and_preprocessors():
+    """Load trained model and preprocessing objects"""
     try:
         print(f"Loading model from: {MODEL_PATH}")
         state.model = load_model(MODEL_PATH)
@@ -83,7 +90,7 @@ def load_model_and_preprocessors():
         state.scaler = pickle.load(open(SCALER_PATH, 'rb'))
         print(f"Loading label encoder from: {ENCODER_PATH}")
         state.label_encoder = pickle.load(open(ENCODER_PATH, 'rb'))
-        print(" Model and preprocessors loaded successfully")
+        print("✓ Model and preprocessors loaded successfully")
         return True
     except Exception as e:
         print(f"ERROR loading model or preprocessors: {e}")
@@ -92,7 +99,9 @@ def load_model_and_preprocessors():
 # Load on startup
 load_model_and_preprocessors()
 
-# Utilities 
+#UTILITIES
+
+
 def track_request(f):
     """Decorator to track API requests"""
     @wraps(f)
@@ -122,7 +131,7 @@ def extract_features(audio_data, sr=22050):
         features.extend(np.max(mfccs, axis=1))
         features.extend(np.min(mfccs, axis=1))
         
-        # Spectral Centroid
+        # Spectral Centroid 
         sc = librosa.feature.spectral_centroid(y=audio_data, sr=sr)
         features.extend([np.mean(sc), np.std(sc), np.max(sc)])
         
@@ -143,7 +152,7 @@ def extract_features(audio_data, sr=22050):
         mel_db = librosa.power_to_db(mel_spec, ref=np.max)
         features.extend([np.mean(mel_db), np.std(mel_db), np.max(mel_db)])
         
-        # Spectral Bandwidth
+        # Spectral Bandwidth 
         sbw = librosa.feature.spectral_bandwidth(y=audio_data, sr=sr)
         features.extend([np.mean(sbw), np.std(sbw)])
         
@@ -160,11 +169,9 @@ def load_audio(file_storage):
     """Load audio from uploaded file (WAV or MP3)"""
     try:
         filename = file_storage.filename.lower()
-        
-        # Read file into memory
         audio_bytes = io.BytesIO(file_storage.read())
         
-        # Load with librosa 
+        # Load with librosa
         y, sr = librosa.load(audio_bytes, sr=22050)
         
         # Trim silence
@@ -175,14 +182,16 @@ def load_audio(file_storage):
             print(f"Audio too short: {len(y_trimmed)/sr:.2f} seconds")
             return None, None
         
-        print(f" Audio loaded: {len(y_trimmed)/sr:.2f} seconds")
+        print(f"✓ Audio loaded: {len(y_trimmed)/sr:.2f} seconds")
         return y_trimmed, sr
         
     except Exception as e:
         print(f"Audio loading error: {e}")
         return None, None
 
-# Retraining Function
+# RETRAINING FUNCTION
+
+
 def retrain_model_background():
     """Background retraining process (simulated)"""
     state.is_retraining = True
@@ -191,7 +200,7 @@ def retrain_model_background():
     try:
         print("Starting retraining process...")
         
-        #  Check for new data
+        # Check for new data
         state.retrain_progress = 10
         time.sleep(1)
         
@@ -209,17 +218,17 @@ def retrain_model_background():
         state.retrain_progress = 30
         time.sleep(2)
         
-        #  Process audio files 
+        # Process audio files
         print("Processing audio files...")
         state.retrain_progress = 50
         time.sleep(2)
         
-        #  Retrain model 
+        # Retrain model
         print("Retraining model...")
         state.retrain_progress = 80
         time.sleep(2)
         
-        #  Reload model
+        # Reload model
         print("Reloading model...")
         load_model_and_preprocessors()
         
@@ -230,7 +239,7 @@ def retrain_model_background():
         current_version = float(state.model_version.replace('v', ''))
         state.model_version = f"v{current_version + 0.1:.1f}"
         
-        print(f"Retraining completed! New version: {state.model_version}")
+        print(f"✓ Retraining completed! New version: {state.model_version}")
         
     except Exception as e:
         print(f"Retraining error: {e}")
@@ -238,7 +247,7 @@ def retrain_model_background():
     finally:
         state.is_retraining = False
 
-#  ROUTES 
+# API ROUTES
 
 @app.route('/')
 def index():
@@ -348,7 +357,7 @@ def upload_bulk():
             file_path = os.path.join(RETRAIN_FOLDER, filename)
             file.save(file_path)
             uploaded_count += 1
-            print(f" Saved: {filename}")
+            print(f"✓ Saved: {filename}")
         else:
             skipped_count += 1
     
@@ -367,7 +376,6 @@ def trigger_retrain():
     if state.is_retraining:
         return jsonify({'error': 'Retraining already in progress'}), 400
     
-    # Check if I have files to retrain on
     audio_files = [f for f in os.listdir(RETRAIN_FOLDER) 
                   if f.lower().endswith(('.wav', '.mp3'))]
     
@@ -408,19 +416,10 @@ def get_classes():
         'num_classes': len(state.label_encoder.classes_)
     })
 
-# Error Handlers 
-@app.errorhandler(404)
-def not_found(error):
-    return jsonify({'error': 'Endpoint not found'}), 404
-
-@app.errorhandler(500)
-def internal_error(error):
-    return jsonify({'error': 'Internal server error'}), 500
 @app.route('/api/feature_analysis', methods=['GET'])
 def feature_analysis():
-    """Analyze 3 key features from the dataset"""
+    """Analyze audio features from retrain dataset"""
     try:
-        # Sample audio files from retrain folder to analyze
         audio_files = [f for f in os.listdir(RETRAIN_FOLDER) if f.lower().endswith(('.wav', '.mp3'))]
         
         if len(audio_files) < 5:
@@ -461,7 +460,7 @@ def feature_analysis():
                 mfcc_means.append(mfcc_mean)
                 spectral_centroids.append(sc_mean)
                 zcr_means.append(zcr_mean)
-                labels.append(audio_file[:20])  # Truncate filename for display
+                labels.append(audio_file[:20])
                 
             except Exception as e:
                 print(f"Error analyzing {audio_file}: {e}")
@@ -471,20 +470,20 @@ def feature_analysis():
             'mfcc_analysis': {
                 'values': mfcc_means,
                 'labels': labels,
-                'description': 'MFCC (Mel-frequency cepstral coefficients) represents the short-term power spectrum of sound. Higher values indicate more complex frequency patterns, typical of bird calls with rich harmonics.',
-                'interpretation': f'Average MFCC: {np.mean(mfcc_means):.2f}. This shows the spectral envelope of the audio signals.'
+                'description': 'MFCC represents spectral characteristics of sound. Higher values indicate richer frequency patterns.',
+                'interpretation': f'Average MFCC: {np.mean(mfcc_means):.2f}'
             },
             'spectral_centroid': {
                 'values': spectral_centroids,
                 'labels': labels,
-                'description': 'Spectral Centroid indicates where the "center of mass" of the spectrum is located. Higher values suggest brighter sounds with more high-frequency content.',
-                'interpretation': f'Average Spectral Centroid: {np.mean(spectral_centroids):.2f} Hz. This indicates the brightness of the bird calls in your dataset.'
+                'description': 'Spectral Centroid indicates brightness. Higher values suggest more high-frequency content.',
+                'interpretation': f'Average Spectral Centroid: {np.mean(spectral_centroids):.2f} Hz'
             },
             'zcr_analysis': {
                 'values': zcr_means,
                 'labels': labels,
-                'description': 'Zero Crossing Rate measures how often the signal changes from positive to negative. Higher values indicate noisier, more percussive sounds.',
-                'interpretation': f'Average ZCR: {np.mean(zcr_means):.4f}. This reflects the noisiness and texture of the bird sounds.'
+                'description': 'Zero Crossing Rate measures noisiness. Higher values indicate more percussive sounds.',
+                'interpretation': f'Average ZCR: {np.mean(zcr_means):.4f}'
             },
             'summary': {
                 'total_samples': len(mfcc_means),
@@ -502,18 +501,13 @@ def feature_analysis():
             'zcr_analysis': {'values': [], 'labels': []}
         }), 500
 
-
 @app.route('/api/model_performance', methods=['GET'])
 def model_performance():
     """Get detailed model performance metrics"""
     try:
         if len(state.prediction_history) == 0:
-            return jsonify({
-                'error': 'No predictions made yet',
-                'performance': {}
-            })
+            return jsonify({'error': 'No predictions made yet', 'performance': {}})
         
-        # Calculate performance metrics
         confidences = [p['confidence'] for p in state.prediction_history]
         species_counts = {}
         
@@ -521,7 +515,6 @@ def model_performance():
             species = pred['species']
             species_counts[species] = species_counts.get(species, 0) + 1
         
-        # Get top 5 predicted species
         top_species = sorted(species_counts.items(), key=lambda x: x[1], reverse=True)[:5]
         
         return jsonify({
@@ -547,14 +540,10 @@ def model_performance():
     except Exception as e:
         return jsonify({'error': f'Performance analysis failed: {str(e)}'}), 500
 
-
 @app.route('/api/system_stats', methods=['GET'])
 def system_stats():
     """Get comprehensive system statistics"""
     try:
-        import psutil
-        
-        # System resources
         cpu_percent = psutil.cpu_percent(interval=1)
         memory = psutil.virtual_memory()
         disk = psutil.disk_usage('/')
@@ -587,40 +576,47 @@ def system_stats():
             }
         })
         
-    except ImportError:
-        return jsonify({
-            'error': 'psutil not installed. Run: pip install psutil',
-            'application': {
-                'uptime_seconds': state.get_uptime(),
-                'total_requests': state.request_count,
-                'error_count': state.error_count
-            }
-        })
     except Exception as e:
         return jsonify({'error': f'System stats failed: {str(e)}'}), 500
 
-# Run Server 
-if __name__ == '__main__':
-    print("\n" + "="*60)
-    print(" Bird Sound Classification API")
-    print(f"Model Path: {MODEL_PATH}")
-    print(f"Scaler Path: {SCALER_PATH}")
-    print(f"Encoder Path: {ENCODER_PATH}")
-    print(f"Upload Folder: {UPLOAD_FOLDER}")
-    print(f"Retrain Folder: {RETRAIN_FOLDER}")
-    print("\nStarting server...")
-    print("Access UI at: http://localhost:5000")
-    print("API Docs:")
-    print("  - GET  /api/health")
-    print("  - GET  /api/metrics")
-    print("  - POST /api/predict")
-    print("  - POST /api/upload_bulk")
-    print("  - POST /api/trigger_retrain")
-    print("  - GET  /api/retrain_status")
-    print("  - GET  /api/classes")
-    
-    #  routes and logic 
+# ERROR HANDLERS
 
-if __name__ == "__main__":
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({'error': 'Endpoint not found'}), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({'error': 'Internal server error'}), 500
+
+
+# SERVER STARTUP
+
+
+if __name__ == '__main__':
+    print("\n" + "="*70)
+    print("🐦 BIRD SOUND CLASSIFICATION API")
+    print("="*70)
+    print(f"\nModel Configuration:")
+    print(f"  Model Path:     {MODEL_PATH}")
+    print(f"  Scaler Path:    {SCALER_PATH}")
+    print(f"  Encoder Path:   {ENCODER_PATH}")
+    print(f"  Upload Folder:  {UPLOAD_FOLDER}")
+    print(f"  Retrain Folder: {RETRAIN_FOLDER}")
+    print(f"\nAPI Endpoints:")
+    print(f"  GET  /api/health")
+    print(f"  GET  /api/metrics")
+    print(f"  GET  /api/classes")
+    print(f"  POST /api/predict")
+    print(f"  POST /api/upload_bulk")
+    print(f"  POST /api/trigger_retrain")
+    print(f"  GET  /api/retrain_status")
+    print(f"  GET  /api/feature_analysis")
+    print(f"  GET  /api/model_performance")
+    print(f"  GET  /api/system_stats")
+    print(f"\nStarting Flask API server...")
+    print("="*70 + "\n")
+    
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=True, threaded=True)
